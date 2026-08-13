@@ -1,0 +1,11 @@
+build/
+.idea/
+.kotlin/
+.gradle/
+node_modules/
+.dist/
+.terraform/
+.terraform.*
+.env*
+.next/
+.DS_Store
