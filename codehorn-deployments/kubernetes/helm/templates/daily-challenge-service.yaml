@@ -1,0 +1,70 @@
+{{- if .Values.dailyChallenge.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-daily-challenge-service
+  labels:
+    app: {{ .Release.Name }}-daily-challenge-service
+spec:
+  replicas: {{ .Values.dailyChallenge.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-daily-challenge-service
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-daily-challenge-service
+    spec:
+      containers:
+        # Main Daily Challenge Service Container
+        - name: main
+          image: '{{ .Values.dailyChallenge.image.repository }}{{ if eq .Values.dailyChallenge.image.sha "" }}:latest{{ else }}@{{ .Values.dailyChallenge.image.sha }}{{ end }}'
+          imagePullPolicy: {{ .Values.dailyChallenge.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.dailyChallenge.service.port }}
+              protocol: TCP
+          env:
+            - name: SPRING_APPLICATION_NAME
+              value: "daily-challenge-service"
+            - name: SERVER_PORT
+              value: "{{ .Values.dailyChallenge.service.port }}"
+            - name: MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE
+              value: "health"
+            {{- if .Values.consul.enabled }}
+            - name: SPRING_CLOUD_CONSUL_DISCOVERY_HOSTNAME
+              value: "{{ .Release.Name }}-daily-challenge-service"
+            - name: SPRING_CLOUD_CONSUL_DISCOVERY_PORT
+              value: "{{ .Values.dailyChallenge.service.port }}"
+            - name: SPRING_CLOUD_CONSUL_DISCOVERY_HEALTH_CHECK_PATH
+              value: "/actuator/health"
+            - name: SPRING_CLOUD_CONSUL_DISCOVERY_HEALTH_CHECK_INTERVAL
+              value: "10s"
+            {{- else }}
+            - name: SPRING_CLOUD_CONSUL_ENABLED
+              value: "false"
+            {{- end }}
+          {{- if .Values.consul.enabled }}
+          envFrom:
+            - configMapRef:
+                name: {{ .Release.Name }}-consul-config
+          {{- end }}
+          resources:
+            {{- toYaml .Values.dailyChallenge.resources | nindent 12 }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-daily-challenge-service
+  labels:
+    app: {{ .Release.Name }}-daily-challenge-service
+spec:
+  type: {{ .Values.dailyChallenge.service.type }}
+  ports:
+    - port: {{ .Values.dailyChallenge.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app: {{ .Release.Name }}-daily-challenge-service
+{{- end }}

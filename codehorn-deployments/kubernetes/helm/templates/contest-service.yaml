@@ -1,0 +1,70 @@
+{{- if .Values.contest.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-contest-service
+  labels:
+    app: {{ .Release.Name }}-contest-service
+spec:
+  replicas: {{ .Values.contest.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-contest-service
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-contest-service
+    spec:
+      containers:
+        # Main Contest Service Container
+        - name: main
+          image: '{{ .Values.contest.image.repository }}{{ if eq .Values.contest.image.sha "" }}:latest{{ else }}@{{ .Values.contest.image.sha }}{{ end }}'
+          imagePullPolicy: {{ .Values.contest.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.contest.service.port }}
+              protocol: TCP
+          env:
+            - name: SPRING_APPLICATION_NAME
+              value: "contest-service"
+            - name: SERVER_PORT
+              value: "{{ .Values.contest.service.port }}"
+            - name: MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE
+              value: "health"
+            {{- if .Values.consul.enabled }}
+            - name: SPRING_CLOUD_CONSUL_DISCOVERY_HOSTNAME
+              value: "{{ .Release.Name }}-contest-service"
+            - name: SPRING_CLOUD_CONSUL_DISCOVERY_PORT
+              value: "{{ .Values.contest.service.port }}"
+            - name: SPRING_CLOUD_CONSUL_DISCOVERY_HEALTH_CHECK_PATH
+              value: "/actuator/health"
+            - name: SPRING_CLOUD_CONSUL_DISCOVERY_HEALTH_CHECK_INTERVAL
+              value: "10s"
+            {{- else }}
+            - name: SPRING_CLOUD_CONSUL_ENABLED
+              value: "false"
+            {{- end }}
+          {{- if .Values.consul.enabled }}
+          envFrom:
+            - configMapRef:
+                name: {{ .Release.Name }}-consul-config
+          {{- end }}
+          resources:
+            {{- toYaml .Values.contest.resources | nindent 12 }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-contest-service
+  labels:
+    app: {{ .Release.Name }}-contest-service
+spec:
+  type: {{ .Values.contest.service.type }}
+  ports:
+    - port: {{ .Values.contest.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app: {{ .Release.Name }}-contest-service
+{{- end }}

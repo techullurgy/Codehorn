@@ -1,0 +1,214 @@
+# Default values for Codehorn Execution Services.
+
+global:
+  environment: production
+  cloudsqlUrl: "jdbc:mysql://cloudsql-proxy-service.sql-proxy.svc.cluster.local:3306"
+# Common configurations
+common:
+  restartPolicy: Always
+# C++ Execution Service
+cpp:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: irsathkareem/codehorn-cpp-execution-service
+    pullPolicy: IfNotPresent
+    sha: "sha256:b9322f6754a4e69fd7d05fe923185948e71d49a72ec741584b617f86364d81ca"
+  sidecar:
+    image:
+      repository: docker
+      tag: "24.0.7-dind"
+      pullPolicy: IfNotPresent
+    runnerImage: "gcc:13"
+  service:
+    type: ClusterIP
+    port: 80
+  resources: {}
+# Java Execution Service
+java:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: irsathkareem/codehorn-java-execution-service
+    pullPolicy: IfNotPresent
+    sha: "sha256:a08fbb8e06e50c85842d5fcd2e554d6d4923c81f33053ea507edd0c0a667c4b3"
+  sidecar:
+    image:
+      repository: docker
+      tag: "24.0.7-dind"
+      pullPolicy: IfNotPresent
+    runnerImage: "eclipse-temurin:17"
+  service:
+    type: ClusterIP
+    port: 80
+  resources: {}
+# Python Execution Service
+python:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: irsathkareem/codehorn-python-execution-service
+    pullPolicy: IfNotPresent
+    sha: "sha256:5b1bbabacdfd84ffdac7f335545253543ca863ca6d385516fa7679ccb1c5d593"
+  sidecar:
+    image:
+      repository: docker
+      tag: "24.0.7-dind"
+      pullPolicy: IfNotPresent
+    runnerImage: "python:3.11-slim"
+  service:
+    type: ClusterIP
+    port: 80
+  resources: {}
+# Javascript Execution Service
+javascript:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: irsathkareem/codehorn-javascript-execution-service
+    pullPolicy: IfNotPresent
+    sha: "sha256:b45d9c3f06bf4fa4928348dce1cce51df630ae5ca102e39ba1556ed59e1fd0b4"
+  sidecar:
+    image:
+      repository: docker
+      tag: "24.0.7-dind"
+      pullPolicy: IfNotPresent
+    runnerImage: "node:20-slim"
+  service:
+    type: ClusterIP
+    port: 80
+  resources: {}
+# Problems Service
+problems:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: irsathkareem/codehorn-problems-service
+    pullPolicy: IfNotPresent
+    sha: "sha256:d7e9b72079c60f883ae978ec69a532cbe1244435505f7dd396f7fafb4a78f997"
+  service:
+    type: ClusterIP
+    port: 80
+  resources: {}
+# Contest Service
+contest:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: irsathkareem/codehorn-contest-service
+    pullPolicy: IfNotPresent
+    sha: "sha256:d4a307c2187114fef664a5a5e8883ad1783c22e8fad00c64d9c53d73833b3e17"
+  service:
+    type: ClusterIP
+    port: 80
+  resources: {}
+# Daily Challenge Service
+dailyChallenge:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: irsathkareem/codehorn-daily-challenge-service
+    pullPolicy: IfNotPresent
+    sha: "sha256:2bd79ee6473e9058553692caeb3ddfd6769bac8d609581a98edd416723faeea4"
+  service:
+    type: ClusterIP
+    port: 80
+  resources: {}
+# CodeSubmission Service
+codeSubmission:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: irsathkareem/codehorn-code-submission-service
+    pullPolicy: IfNotPresent
+    sha: "sha256:b2bbd04ac3043746a66c5997a11ca2b89fc68694dbeeb4c212f652beb0d052e6"
+  service:
+    type: ClusterIP
+    port: 80
+  resources: {}
+# CodeExecution Service
+codeExecution:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: irsathkareem/codehorn-code-execution-service
+    pullPolicy: IfNotPresent
+    sha: "sha256:aaa319d12bc0fd6e99d74bec88cf83eb8270dbfc1e9232504cb3ac813ea88225"
+  service:
+    type: ClusterIP
+    port: 80
+  resources: {}
+# Gateway Service
+gateway:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: irsathkareem/codehorn-gateway-service
+    pullPolicy: IfNotPresent
+    sha: "sha256:bd96d9bf992f541a0d18dd762547f4151fd93660e37e1ae0e52b16e409f81fa2"
+  service:
+    type: ClusterIP
+    port: 80
+  resources: {}
+# Auth Service
+auth:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: irsathkareem/codehorn-auth-service
+    pullPolicy: IfNotPresent
+    sha: "sha256:798d56fe38c618edf74911f7442ab02f5b773a6fc320f9e42ff893c236bc4c95"
+  service:
+    type: ClusterIP
+    port: 80
+  resources: {}
+# ProblemSubmission Service
+problemSubmission:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: irsathkareem/codehorn-problem-submission-service
+    pullPolicy: IfNotPresent
+    sha: "sha256:977911a72aa7e6c09269bee0f9fc296812fb1bad38991c929ff11560a8af1a90"
+  service:
+    type: ClusterIP
+    port: 80
+  resources: {}
+# Frontend Service
+frontend:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: irsathkareem/codehorn-app
+    sha: "sha256:f070f231a3ba88b10570359bfe96c08e642d7bd02116d4d668e16c6b7c343436"
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 3000
+  env:
+    useGateway: "false"
+  resources: {}
+# Consul Service
+consul:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: hashicorp/consul
+    pullPolicy: IfNotPresent
+    tag: "2.0"
+  service:
+    type: ClusterIP
+    port: 8500
+  resources: {}
+# Nginx LoadBalancer Service
+nginx:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: nginx
+    tag: alpine
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 80
+  resources: {}

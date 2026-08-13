@@ -1,0 +1,70 @@
+{{- if .Values.problems.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-problems-service
+  labels:
+    app: {{ .Release.Name }}-problems-service
+spec:
+  replicas: {{ .Values.problems.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-problems-service
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-problems-service
+    spec:
+      containers:
+        # Main Problems Service Container
+        - name: main
+          image: '{{ .Values.problems.image.repository }}{{ if eq .Values.problems.image.sha "" }}:latest{{ else }}@{{ .Values.problems.image.sha }}{{ end }}'
+          imagePullPolicy: {{ .Values.problems.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.problems.service.port }}
+              protocol: TCP
+          env:
+            - name: SPRING_APPLICATION_NAME
+              value: "problems-service"
+            - name: SERVER_PORT
+              value: "{{ .Values.problems.service.port }}"
+            - name: MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE
+              value: "health"
+            {{- if .Values.consul.enabled }}
+            - name: SPRING_CLOUD_CONSUL_DISCOVERY_HOSTNAME
+              value: "{{ .Release.Name }}-problems-service"
+            - name: SPRING_CLOUD_CONSUL_DISCOVERY_PORT
+              value: "{{ .Values.problems.service.port }}"
+            - name: SPRING_CLOUD_CONSUL_DISCOVERY_HEALTH_CHECK_PATH
+              value: "/actuator/health"
+            - name: SPRING_CLOUD_CONSUL_DISCOVERY_HEALTH_CHECK_INTERVAL
+              value: "10s"
+            {{- else }}
+            - name: SPRING_CLOUD_CONSUL_ENABLED
+              value: "false"
+            {{- end }}
+          {{- if .Values.consul.enabled }}
+          envFrom:
+            - configMapRef:
+                name: {{ .Release.Name }}-consul-config
+          {{- end }}
+          resources:
+            {{- toYaml .Values.problems.resources | nindent 12 }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-problems-service
+  labels:
+    app: {{ .Release.Name }}-problems-service
+spec:
+  type: {{ .Values.problems.service.type }}
+  ports:
+    - port: {{ .Values.problems.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app: {{ .Release.Name }}-problems-service
+{{- end }}

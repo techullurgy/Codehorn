@@ -1,0 +1,70 @@
+{{- if .Values.codeSubmission.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-code-submission-service
+  labels:
+    app: {{ .Release.Name }}-code-submission-service
+spec:
+  replicas: {{ .Values.codeSubmission.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-code-submission-service
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-code-submission-service
+    spec:
+      containers:
+        # Main CodeSubmission Service Container
+        - name: main
+          image: '{{ .Values.codeSubmission.image.repository }}{{ if eq .Values.codeSubmission.image.sha "" }}:latest{{ else }}@{{ .Values.codeSubmission.image.sha }}{{ end }}'
+          imagePullPolicy: {{ .Values.codeSubmission.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.codeSubmission.service.port }}
+              protocol: TCP
+          env:
+            - name: SPRING_APPLICATION_NAME
+              value: "code-submission-service"
+            - name: SERVER_PORT
+              value: "{{ .Values.codeSubmission.service.port }}"
+            - name: MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE
+              value: "health"
+            {{- if .Values.consul.enabled }}
+            - name: SPRING_CLOUD_CONSUL_DISCOVERY_HOSTNAME
+              value: "{{ .Release.Name }}-code-submission-service"
+            - name: SPRING_CLOUD_CONSUL_DISCOVERY_PORT
+              value: "{{ .Values.codeSubmission.service.port }}"
+            - name: SPRING_CLOUD_CONSUL_DISCOVERY_HEALTH_CHECK_PATH
+              value: "/actuator/health"
+            - name: SPRING_CLOUD_CONSUL_DISCOVERY_HEALTH_CHECK_INTERVAL
+              value: "10s"
+            {{- else }}
+            - name: SPRING_CLOUD_CONSUL_ENABLED
+              value: "false"
+            {{- end }}
+          {{- if .Values.consul.enabled }}
+          envFrom:
+            - configMapRef:
+                name: {{ .Release.Name }}-consul-config
+          {{- end }}
+          resources:
+            {{- toYaml .Values.codeSubmission.resources | nindent 12 }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-code-submission-service
+  labels:
+    app: {{ .Release.Name }}-code-submission-service
+spec:
+  type: {{ .Values.codeSubmission.service.type }}
+  ports:
+    - port: {{ .Values.codeSubmission.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app: {{ .Release.Name }}-code-submission-service
+{{- end }}
