@@ -49,8 +49,13 @@ export default function ProblemList() {
   const categories = ['All', 'Arrays', 'Stack', 'Sliding Window', 'Two Pointers', 'Binary Search'];
 
   // Calendar states & navigation
+  const [isMounted, setIsMounted] = React.useState(false);
   const [calendarDate, setCalendarDate] = React.useState(() => new Date());
   const [selectedDayObj, setSelectedDayObj] = React.useState<Date>(() => new Date());
+
+  React.useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const currentYear = calendarDate.getFullYear();
   const currentMonth = calendarDate.getMonth();
@@ -364,7 +369,7 @@ export default function ProblemList() {
               <div className="grid grid-cols-7 gap-1.5">
                 {allCalendarDays.map((day, idx) => {
                   const isSelected = selectedDayObj.getDate() === day.day && selectedDayObj.getMonth() === day.date.getMonth() && selectedDayObj.getFullYear() === day.date.getFullYear();
-                  const isToday = today.getDate() === day.day && today.getMonth() === day.date.getMonth() && today.getFullYear() === day.date.getFullYear();
+                  const isToday = isMounted && today.getDate() === day.day && today.getMonth() === day.date.getMonth() && today.getFullYear() === day.date.getFullYear();
                   const statusVal = day.isCurrentMonth ? getDayStatus(day.date) : 'Todo';
 
                   // Base classes

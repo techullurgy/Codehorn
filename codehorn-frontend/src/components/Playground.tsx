@@ -3,17 +3,17 @@
 import React, { useState, useEffect } from 'react';
 import Editor from '@monaco-editor/react';
 import { useCodeHornStore } from '../store/useCodeHornStore';
-import { 
-  Play, 
-  Terminal, 
-  Save, 
-  Copy, 
-  Trash2, 
-  Check, 
-  HelpCircle, 
-  AlertCircle, 
-  ArrowLeftRight, 
-  Sparkles 
+import {
+  Play,
+  Terminal,
+  Save,
+  Copy,
+  Trash2,
+  Check,
+  HelpCircle,
+  AlertCircle,
+  ArrowLeftRight,
+  Sparkles
 } from 'lucide-react';
 
 const STARTER_SCRATCHPADS: Record<string, string> = {
@@ -116,7 +116,7 @@ export default function Playground() {
       if (language === 'javascript') {
         // Evaluate JavaScript code capturing stdout log events
         const outputLogs: string[] = [];
-        
+
         // Mock standard console.log interceptor
         const originalLog = console.log;
         console.log = (...args) => {
@@ -154,7 +154,7 @@ export default function Playground() {
 
   return (
     <div className="flex-1 bg-zinc-950 text-zinc-100 flex flex-col overflow-hidden" id="sandbox-playground-panel">
-      
+
       {/* Upper toolbar controls row */}
       <div className="h-14 border-b border-zinc-800 bg-zinc-900/10 px-6 flex items-center justify-between shrink-0 select-none">
         <div className="flex items-center space-x-4">
@@ -185,7 +185,7 @@ export default function Playground() {
 
         {/* Action button widgets */}
         <div className="flex items-center space-x-2">
-          
+
           {/* Editor Theme Dropdown */}
           <select
             value={editorTheme}
@@ -252,7 +252,7 @@ export default function Playground() {
 
       {/* Workspace splits (split Monaco editor and compiler terminal output) */}
       <div className="flex-1 flex flex-col md:flex-row min-h-0 overflow-hidden">
-        
+
         {/* Editor component Frame workspace */}
         <div className="flex-1 min-h-0 relative border-r border-zinc-900">
           <Editor
@@ -282,7 +282,7 @@ export default function Playground() {
 
         {/* Sandboxed Output Terminal panel */}
         <div className="w-full md:w-[420px] bg-zinc-950 shrink-0 flex flex-col border-t md:border-t-0 md:border-l border-zinc-900">
-          
+
           <div className="px-4 h-10 border-b border-zinc-900 bg-zinc-900/20 shrink-0 flex items-center space-x-2 select-none">
             <Terminal className="w-4 h-4 text-amber-500" />
             <span className="text-xs font-bold text-zinc-300">Sandboxed Terminal Output</span>
@@ -290,7 +290,7 @@ export default function Playground() {
 
           {/* Logs scroll console list */}
           <div className="flex-1 overflow-y-auto p-5 font-mono text-xs text-zinc-400 space-y-4">
-            
+
             <div className="space-y-1.5">
               <div className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Console session description:</div>
               <p className="text-zinc-500 leading-relaxed font-sans text-xs">
@@ -321,7 +321,7 @@ export default function Playground() {
                 </div>
               ) : stdout.length > 0 || returnValue ? (
                 <div className="space-y-3 font-mono">
-                  
+
                   {stdout.length > 0 && (
                     <div className="space-y-1.5 p-3.5 bg-zinc-900/60 border border-zinc-850 rounded-xl">
                       <div className="text-[10px] text-zinc-500 uppercase tracking-widest font-black mb-1.5">Captured Stdout:</div>

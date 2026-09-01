@@ -42,7 +42,11 @@ interface CodeHornState {
   isDailyChallenge: boolean;
   dailyChallengeDate: string | null;
 
+  // Hydration state
+  isHydrated: boolean;
+
   // Actions
+  hydrateFromLocalStorage: () => void;
   fetchProblems: () => Promise<void>;
   selectProblem: (problem: Problem | null) => void;
   selectDailyChallenge: (problem: Problem, dateStr: string) => void;
@@ -72,56 +76,21 @@ interface CodeHornState {
   getSolvedCount: () => { easy: number; medium: number; hard: number; total: number };
 }
 
-// Initial Code Draft Template Helper
-const getInitialCodeDrafts = () => {
-  try {
-    if (typeof window !== 'undefined') {
-      const drafts = localStorage.getItem('codehorn_drafts_v1');
-      return drafts ? JSON.parse(drafts) : {};
-    }
-  } catch {
-    // Fallback
-  }
-  return {};
-};
-
-const getInitialSubmissions = () => {
-  try {
-    if (typeof window !== 'undefined') {
-      const subs = localStorage.getItem('codehorn_subs_v1');
-      return subs ? JSON.parse(subs) : [];
-    }
-  } catch {
-    // Fallback
-  }
-  return [];
-};
-
-const getSafeLocalStorageItem = (key: string, defaultValue: string): string => {
-  try {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem(key) || defaultValue;
-    }
-  } catch {
-    // Fallback
-  }
-  return defaultValue;
-};
-
 export const useCodeHornStore = create<CodeHornState>((set, get) => ({
   problems: [],
   selectedProblem: null,
   currentView: 'list',
   loading: false,
+  isHydrated: false,
 
   isDailyChallenge: false,
   dailyChallengeDate: null,
 
   currentLanguage: 'javascript',
-  codeDrafts: getInitialCodeDrafts(),
+  codeDrafts: {},
   customTestcase: '',
   editorTheme: 'vs-dark',
-  globalTheme: (getSafeLocalStorageItem('codehorn_global_theme', 'dark') as 'dark' | 'light'),
+  globalTheme: 'dark',
 
   filters: {
     difficulty: 'All',
@@ -130,15 +99,37 @@ export const useCodeHornStore = create<CodeHornState>((set, get) => ({
     category: 'All',
   },
 
-  submissions: getInitialSubmissions(),
+  submissions: [],
   isRunning: false,
   isSubmitting: false,
   latestResult: null,
   activeResultTab: 'testcase',
   activeLeftTab: 'description',
 
-  streak: Number(getSafeLocalStorageItem('codehorn_streak', '3')),
-  xpPoints: Number(getSafeLocalStorageItem('codehorn_xp', '240')),
+  streak: 3,
+  xpPoints: 240,
+
+  hydrateFromLocalStorage: () => {
+    if (typeof window === 'undefined') return;
+    try {
+      const drafts = localStorage.getItem('codehorn_drafts_v1');
+      const subs = localStorage.getItem('codehorn_subs_v1');
+      const theme = localStorage.getItem('codehorn_global_theme') as 'dark' | 'light' | null;
+      const streak = localStorage.getItem('codehorn_streak');
+      const xp = localStorage.getItem('codehorn_xp');
+
+      set({
+        codeDrafts: drafts ? JSON.parse(drafts) : {},
+        submissions: subs ? JSON.parse(subs) : [],
+        globalTheme: theme === 'light' || theme === 'dark' ? theme : 'dark',
+        streak: streak ? Number(streak) : 3,
+        xpPoints: xp ? Number(xp) : 240,
+        isHydrated: true,
+      });
+    } catch {
+      set({ isHydrated: true });
+    }
+  },
 
   fetchProblems: async () => {
     set({ loading: true });

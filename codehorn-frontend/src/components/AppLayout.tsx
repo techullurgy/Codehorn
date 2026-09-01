@@ -25,6 +25,7 @@ export default function AppLayout({ children, initialProblems }: AppLayoutProps)
   const { globalTheme, fetchProblems } = useCodeHornStore();
 
   useEffect(() => {
+    useCodeHornStore.getState().hydrateFromLocalStorage();
     if (initialProblems && initialProblems.length > 0) {
       // Sync pre-fetched problems to Zustand store
       useCodeHornStore.setState({ problems: initialProblems });
