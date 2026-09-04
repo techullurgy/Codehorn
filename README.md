@@ -1,171 +1,248 @@
-# 🧑‍💻 Codehorn — Online Coding & Programming Platform
+# CodeHorn
 
-> A production-oriented LeetCode-inspired coding platform built with Spring Boot, Microservices, MongoDB, React/Next.js, and modern cloud-native technologies.
+**CodeHorn** is a cloud-native online coding judge platform inspired by LeetCode, designed for developers to solve programming challenges, execute code securely, and receive instant feedback. The platform combines a modern web experience with a scalable microservices backend capable of handling concurrent code execution, automated evaluation, and distributed workloads.
 
-Codehorn is a full-stack online coding platform where users can solve programming problems, submit solutions, execute code against test cases, track submissions, and manage their coding profiles.
-
-The project is designed as a practical demonstration of:
-
-- Microservices architecture (Spring Cloud Gateway, Consul Service Discovery)
-- REST API design & Reactive WebFlux programming
-- Distributed systems & asynchronous containerized code execution
-- Authentication & authorization
-- Code execution sandboxing (Docker ephemeral containers)
-- Database design (MongoDB & Spring Data)
-- React / Next.js application architecture
-- Containerization & Kubernetes deployment (GKE, Helm, ArgoCD, Terraform)
-- Observability & performance engineering
+Built with a strong emphasis on scalability, security, and DevOps, CodeHorn demonstrates the architecture required to operate a production-ready coding platform—from responsive frontend applications to containerized code execution and Kubernetes-based infrastructure.
 
 ---
 
-## 📌 Project Overview
+# Features
 
-Codehorn provides an online judge experience similar to platforms such as LeetCode.
+## Coding Challenges
 
-Users can:
-
-- Create an account & authenticate securely
-- Browse programming problems
-- Filter and search problems by difficulty, category, or title
-- View problem descriptions, constraints, examples, and hints
-- Write solutions in multiple languages (C++, Java, Python, JavaScript)
-- Execute code against sample test cases
-- Submit solutions to run against full hidden test case suites
-- Receive real-time execution results & compilation logs
-- View submission history and tracking
-- View user dashboard with problem-solving statistics, streaks, and activity heatmaps
+- Browse programming problems across multiple difficulty levels.
+- Rich problem descriptions with examples and constraints.
+- Support for multiple programming languages.
+- Real-time code editing and submission.
+- Instant evaluation against predefined test cases.
+- Submission history and execution results.
 
 ---
 
-## ✨ Key Features
+## Online Code Execution
 
-### 👤 User Management & User Dashboard
-- JWT-based authentication & authorization
-- User profile management
-- Dashboard statistics (Easy, Medium, Hard solved counts)
-- Real-time submission metrics & acceptance rates
-- Streak tracking (current & max streak)
-- Activity heatmap (daily submission calendar graph)
+The platform securely executes user-submitted code inside isolated containers.
 
-### 🧩 Problem Management
-- Problem catalog with title, slug, difficulty, category, and acceptance rates
-- Comprehensive problem descriptions, constraints, examples, and hints
-- Multi-language starter code templates (`javascript`, `python`, `cpp`, `java`)
-- Execution driver templates & canonical reference solutions
-- Sample & hidden test case management
-- Dynamic search and filter endpoints
+Features include:
 
-### 💻 Containerized Online Code Execution Engine
-- Ephemeral Docker container sandboxing with strict timeouts (2-min safety watchdog)
-- Execution providers for C++, Java, Python, and JavaScript
-- STDIN / STDOUT stream serialization & bitmask type parsing (`CodehornTestcaseParserStrategy`)
-
-### 📊 Submission Management
-- Submission lifecycle tracking
-- Execution statuses (`ACCEPTED`, `WRONG_ANSWER`, `TIME_LIMIT_EXCEEDED`, `RUNTIME_ERROR`, `COMPILATION_ERROR`)
-- Detailed runtime (ms) and memory usage metrics
+- Sandboxed execution environment.
+- Resource isolation using Docker.
+- Time and memory limit enforcement.
+- Compilation and runtime error reporting.
+- Test case validation.
+- Execution logs and performance metrics.
 
 ---
 
-## 🧱 Microservices Architecture
+## Responsive Web Experience
 
-| Service | Responsibility | Technology |
-| :--- | :--- | :--- |
-| **Gateway Service** | Service routing, strip-prefix filtering, load balancing | Spring Cloud Gateway, Consul |
-| **Auth Service** | Authentication & JWT token issuing | Spring Boot, Kotlin |
-| **User Service** | Reactive user profiles, dashboards, stats, streaks, heatmaps | Spring WebFlux, Kotlin Coroutines, MongoDB |
-| **Problems Service** | Problem metadata, starter templates, canonical solutions, testcases | Spring Boot, Spring Data MongoDB |
-| **Problem Submission Service** | Submission lifecycle & submission tracking | Spring Boot |
-| **Code Execution Service** | Central code execution orchestrator | Spring Boot, Kotlin Coroutines |
-| **Language Execution Services** | Docker sandboxed execution runners (`cpp`, `java`, `python`, `javascript`) | Spring Boot, Docker sidecars (DinD) |
-| **Frontend** | Interactive client web application | Next.js, React, TypeScript, Monaco Editor |
+Built with modern frontend technologies to provide a fast and intuitive user experience.
+
+Features include:
+
+- Responsive layouts for desktop and mobile.
+- Fast client-side navigation.
+- Efficient data fetching and caching.
+- Modern, accessible user interface.
 
 ---
 
-## 🛠️ Technology Stack
+# Frontend Architecture
 
-### Backend
-- **Languages**: Kotlin, Java
-- **Frameworks**: Spring Boot 3/4, Spring WebFlux, Spring Cloud Gateway, Spring Cloud Consul
-- **Persistence**: MongoDB, Spring Data MongoDB
-- **Execution Sandbox**: Docker, Ephemeral Containers, Bash Entrypoints
-- **Build System**: Gradle multi-project build
+The frontend is built using the latest React ecosystem, focusing on performance, maintainability, and developer experience.
 
-### Frontend
-- **Framework**: Next.js, React, TypeScript
-- **Styling**: Vanilla CSS, Modern Glassmorphism & Responsive Layouts
-- **Editor**: Monaco Editor
+## Core Technologies
 
-### Infrastructure & Cloud Deployment
-- **Containerization**: Docker, Docker Compose
-- **Orchestration**: Kubernetes, Helm
-- **GitOps & CI/CD**: ArgoCD, GitHub Actions
-- **Infrastructure as Code**: Terraform, GCP (GKE, VPC, Cloud NAT)
-- **Ingress Gateway**: Nginx TCP Stream Proxy
+### Next.js
 
----
+- Server-side rendering (SSR).
+- Static site generation (SSG).
+- Optimized routing.
+- Excellent SEO support.
 
-## 🔐 Security Architecture
+### React
 
-1. **JWT Authentication**: Secured user tokens for cross-service authentication.
-2. **Code Execution Isolation**:
-   ```plaintext
-                Untrusted User Code
-                        │
-                        ▼
-                Execution Service
-                        │
-                        ▼
-             ┌─────────────────────┐
-             │ Ephemeral Container │
-             │                     │
-             │ CPU & Memory Limits │
-             │ Strict watchdog     │
-             │ Isolated workspace  │
-             └─────────────────────┘
-                        │
-                        ▼
-                Parsed Test Results
-   ```
+- Component-based architecture.
+- Reusable UI components.
+- Declarative rendering.
+- State-driven user interface.
+
+### TypeScript
+
+- Strong type safety.
+- Improved maintainability.
+- Better developer tooling and IntelliSense.
+
+### TanStack Query
+
+- Efficient server-state management.
+- Intelligent caching.
+- Background data synchronization.
+- Automatic request retries and cache invalidation.
+
+### Tailwind CSS
+
+- Utility-first styling.
+- Responsive design.
+- Consistent design system.
+- Rapid UI development.
 
 ---
 
-## 🔄 Submission Workflow
+# Backend Architecture
 
-```plaintext
-1. User submits solution code from Editor
-        ↓
-2. Frontend sends request to API Gateway (/problem-submission)
-        ↓
-3. Gateway routes request to Problem Submission Service
-        ↓
-4. Execution Service triggers language runner (e.g., Java Execution Service)
-        ↓
-5. Input generator creates workspace & compiles code
-        ↓
-6. Container executes entrypoint.sh against testcase input streams
-        ↓
-7. Output parser evaluates STDOUT/STDERR vs expected testcase results
-        ↓
-8. Container and temporary images are purged
-        ↓
-9. User Service receives activity update (recalculates stats, streak & heatmap)
-        ↓
-10. Final submission status returned to Client
-```
+The backend follows a distributed **microservices architecture**, enabling independent scaling and deployment of each service.
+
+## Core Technologies
+
+### Kotlin + Spring Boot
+
+- REST APIs.
+- Authentication and authorization.
+- Problem management.
+- Submission processing.
+- User management.
+
+### Microservices
+
+Independent services communicate through well-defined APIs and asynchronous workflows, allowing the platform to scale efficiently as demand grows.
+
+### Service Discovery
+
+- Consul for dynamic service registration and discovery.
+- Automatic health checks and service availability monitoring.
+- Service-to-service communication without hardcoded endpoints.
 
 ---
 
-## 🗺️ System Roadmap
+## Secure Code Execution
 
-- [x] User Authentication & Authorization
-- [x] Problem Management & CRUD APIs
-- [x] Multi-Language Starter Code & Execution Driver Templates
-- [x] Reactive User Service & Dashboard Statistics (Streaks, Heatmap)
-- [x] Containerized Code Execution Engine (C++, Java, Python, JavaScript)
-- [x] Service Discovery via Spring Cloud Consul
-- [x] GKE Infrastructure & Terraform Provisioning
-- [x] Helm Chart & ArgoCD GitOps Deployment
-- [ ] Global Leaderboard System
-- [ ] Real-time Live Contest Platform
-- [ ] Distributed Tracing with OpenTelemetry & Grafana
+One of the platform's core components is the isolated execution environment for user submissions.
+
+Key capabilities include:
+
+- Docker-in-Docker (DinD) for sandboxed code execution.
+- Isolated runtime environments.
+- Secure compilation and execution.
+- Resource limits to prevent abuse.
+- Support for multiple programming languages.
+
+---
+
+# Cloud-Native Infrastructure
+
+The platform is designed for modern cloud environments with automation, scalability, and reliability in mind.
+
+## Containerization & Orchestration
+
+- Docker
+- Kubernetes
+- Helm Charts
+- Helm Templates
+- Consul Service Discovery
+
+## Infrastructure as Code
+
+- Terraform
+
+## GitOps
+
+- ArgoCD for automated deployments.
+- Declarative infrastructure management.
+- Environment-specific configuration.
+
+---
+
+# Monitoring & Observability
+
+The platform incorporates comprehensive observability to monitor application health and performance.
+
+Technologies include:
+
+- OpenTelemetry
+- Micrometer
+- Grafana
+
+Key metrics include:
+
+- Request latency.
+- API throughput.
+- Resource utilization.
+- Service health.
+- Distributed tracing.
+- Application metrics.
+
+---
+
+# CI/CD Pipeline
+
+Automated deployment pipelines ensure reliable software delivery.
+
+Features include:
+
+- GitHub Actions.
+- Automated builds.
+- Unit and integration testing.
+- Docker image generation.
+- Kubernetes deployments.
+- Continuous delivery using GitOps.
+
+---
+
+# Technical Focus
+
+CodeHorn demonstrates the design and implementation of a production-ready cloud-native platform by combining modern frontend development with scalable backend infrastructure.
+
+Key areas include:
+
+- Online code execution.
+- Secure containerized workloads.
+- Distributed microservices architecture.
+- Service discovery and health monitoring.
+- Infrastructure as Code.
+- Kubernetes orchestration.
+- GitOps deployment workflows.
+- Monitoring and observability.
+- Modern React and Next.js development.
+- API-driven architecture.
+- High-performance, responsive user interfaces.
+
+---
+
+# Skills Demonstrated
+
+## Frontend
+
+- React
+- Next.js
+- TypeScript
+- TanStack Query
+- Tailwind CSS
+- Responsive Web Design
+- State Management
+- API Integration
+
+## Backend
+
+- Kotlin
+- Spring Boot
+- Microservices Architecture
+- REST API Development
+- Service Discovery (Consul)
+- Secure Code Execution
+- Docker & Docker-in-Docker (DinD)
+
+## Cloud & DevOps
+
+- Docker
+- Kubernetes
+- Helm
+- Terraform
+- GitHub Actions
+- GitOps (ArgoCD)
+- OpenTelemetry
+- Micrometer
+- Grafana
+- CI/CD Pipelines
+- Cloud-Native Architecture
+- Distributed Systems
