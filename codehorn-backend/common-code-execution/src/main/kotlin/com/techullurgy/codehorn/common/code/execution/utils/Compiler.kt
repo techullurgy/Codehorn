@@ -2,7 +2,7 @@ package com.techullurgy.codehorn.common.code.execution.utils
 
 object Compiler {
     const val FROM_DOCKER_IMAGE_FOR_C_COMPILER = "gcc:9.5.0"
-    const val FROM_DOCKER_IMAGE_FOR_JAVA_COMPILER = "amazoncorretto:21"
+    const val FROM_DOCKER_IMAGE_FOR_JAVA_COMPILER = "amazoncorretto:25"
     const val FROM_DOCKER_IMAGE_FOR_JAVASCRIPT_COMPILER = "node:21"
     const val FROM_DOCKER_IMAGE_FOR_CPP_COMPILER = "gcc:9.5.0"
     const val FROM_DOCKER_IMAGE_FOR_PYTHON3_COMPILER = "gcc:9.5.0"

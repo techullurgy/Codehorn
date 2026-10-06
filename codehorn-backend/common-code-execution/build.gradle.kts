@@ -16,6 +16,9 @@ dependencies {
 
     implementation(libs.kotlinx.coroutines.reactor)
     implementation(libs.kotlin.reactor.extensions)
+
+    implementation(libs.docker.java.core)
+    implementation(libs.docker.java.transport.httpclient5)
 }
 
 tasks.withType<BootJar>().configureEach {
