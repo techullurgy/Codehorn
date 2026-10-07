@@ -1,9 +1,38 @@
+# syntax=docker/dockerfile:1
 FROM eclipse-temurin:25 AS jre-build
-COPY . /app/codehorn/.
+
+COPY ./gradlew ./settings.gradle.kts ./build.gradle.kts /app/codehorn/
+COPY ./gradle /app/codehorn/gradle
+# Copy all subproject build files while preserving directory hierarchy
+COPY --parents **/build.gradle.kts /app/codehorn/
+
+#COPY ./common/build.gradle.kts /app/codehorn/common/build.gradle.kts
+#COPY ./gateway-service/build.gradle.kts /app/codehorn/gateway-service/build.gradle.kts
+#COPY ./problem-submission-service/build.gradle.kts /app/codehorn/problem-submission-service/build.gradle.kts
+#COPY ./problems-service/build.gradle.kts /app/codehorn/problems-service/build.gradle.kts
+#COPY ./contest-service/build.gradle.kts /app/codehorn/contest-service/build.gradle.kts
+#COPY ./daily-challenge-service/build.gradle.kts /app/codehorn/daily-challenge-service/build.gradle.kts
+#COPY ./user-service/build.gradle.kts /app/codehorn/user-service/build.gradle.kts
+#COPY ./auth-service/build.gradle.kts /app/codehorn/auth-service/build.gradle.kts
+#COPY ./code-execution-service/build.gradle.kts /app/codehorn/code-execution-service/build.gradle.kts
+#COPY ./code-submission-service/build.gradle.kts /app/codehorn/code-submission-service/build.gradle.kts
+#COPY ./c-execution-service/build.gradle.kts /app/codehorn/c-execution-service/build.gradle.kts
+#COPY ./cpp-execution-service/build.gradle.kts /app/codehorn/cpp-execution-service/build.gradle.kts
+#COPY ./java-execution-service/build.gradle.kts /app/codehorn/java-execution-service/build.gradle.kts
+#COPY ./python-execution-service/build.gradle.kts /app/codehorn/python-execution-service/build.gradle.kts
+#COPY ./javascript-execution-service/build.gradle.kts /app/codehorn/javascript-execution-service/build.gradle.kts
+#COPY ./common-code-execution-service/build.gradle.kts /app/codehorn/common-code-execution-service/build.gradle.kts
 
 WORKDIR /app/codehorn
 
+RUN --mode=type=bind,from=host-gradle-cache,target=/root/.gradle/caches,rw \
+    --mode=type=bind,from=host-gradle-wrapper,target=/root/.gradle/wrapper,rw \
+    chmod +x ./gradlew && ./gradlew dependencies
+
 ARG CODEHORN_APP_VERSION
+
+COPY ./auth-service /app/codehorn/auth-service
+COPY ./common /app/codehorn/common
 
 RUN chmod +x ./gradlew \
     && ./gradlew :auth-service:build -x test \

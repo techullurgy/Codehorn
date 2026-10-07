@@ -1,0 +1,17 @@
+name: Test Microservices Build
+
+on:
+  # push:
+  #   branches:
+  #     - "backend-rework"
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code (backend-rework)
+        uses: actions/checkout@v7
+        with:
+          ref: backend-rework

@@ -4,6 +4,7 @@
 # Re-include specific directories / files
 # Such that
 # COPY . . -----> Includes only these files
+!common*
 !*-service/**
 !gradle/**
 !settings.gradle.kts

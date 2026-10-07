@@ -16,8 +16,8 @@ abstract class CodeEvaluator(
 
     abstract val srcFile: String
 
-    open fun compile(request: ExecutionRequest): CompilationResult = CompilationResult.NotAppropriate
-    abstract fun run(request: ExecutionRequest): Set<RunResult>
+    open fun compile(request: EvaluationRequest): CompilationResult = CompilationResult.NotAppropriate
+    abstract fun run(request: EvaluationRequest): Set<RunResult>
 
     override fun close() {
         rootFolder.deleteRecursively()

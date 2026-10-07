@@ -2,7 +2,6 @@ package com.techullurgy.codehorn.common.models
 
 data class ProblemTestcase(
     val id: String,
-    val isHidden: Boolean = true,
     val inputNames: List<String>,
     val inputs: List<String>,
     val masks: List<Long>,
