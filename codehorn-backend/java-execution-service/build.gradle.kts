@@ -1,3 +1,6 @@
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat
+import org.gradle.api.tasks.testing.logging.TestLogEvent
+
 plugins {
     alias(libs.plugins.kotlinJvmPlugin)
     alias(libs.plugins.springPlugin)
@@ -21,4 +24,22 @@ dependencies {
     implementation(libs.spring.cloud.starter.consul.discovery)
 
     testImplementation(libs.testcontainers.junit.jupiter)
+}
+
+tasks.withType<Test>().configureEach {
+    testLogging {
+        events(
+            TestLogEvent.PASSED,
+            TestLogEvent.FAILED,
+            TestLogEvent.SKIPPED,
+            TestLogEvent.STANDARD_ERROR,
+            TestLogEvent.STANDARD_OUT
+        )
+
+        exceptionFormat = TestExceptionFormat.FULL
+
+        showExceptions = true
+        showCauses = true
+        showStackTraces = true
+    }
 }
