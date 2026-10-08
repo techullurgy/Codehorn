@@ -2,12 +2,14 @@ package com.techullurgy.codehorn.cpp_execution.services
 
 import com.techullurgy.codehorn.common.code.execution.services.CodeEvaluator
 import com.techullurgy.codehorn.common.code.execution.services.CompilationResult
+import com.techullurgy.codehorn.common.code.execution.services.EnvProvider
 import com.techullurgy.codehorn.common.code.execution.services.EvaluationRequest
 import com.techullurgy.codehorn.common.code.execution.services.RunResult
 import com.techullurgy.codehorn.common.code.execution.services.client.CodeExecutorClient
 
-class CppCodeEvaluator(
-    private val evaluationId: String
+internal class CppCodeEvaluator(
+    evaluationId: String,
+    private val envProvider: EnvProvider
 ): CodeEvaluator("evaluation/cpp/$evaluationId") {
 
     companion object {
@@ -17,6 +19,7 @@ class CppCodeEvaluator(
 
     private val codeClient by lazy {
         CodeExecutorClient(
+            envProvider = envProvider,
             baseImage = BASE_IMAGE,
             workingDirInContainer = WORKING_DIR_IN_CONTAINER
         )

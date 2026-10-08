@@ -47,9 +47,9 @@ object JavaTemplates {
             return ans;
           }
           
-          public static void writeResults(String eResult, String result, String tNo) {
-            String resultFileName = "outputs/result" + tNo + ".txt";
-            String eResultFileName = "outputs/eResult" + tNo + ".txt";
+          public static void writeResults(String eResult, String result) {
+            String resultFileName = "/tmp/actual.txt";
+            String eResultFileName = "/tmp/expected.txt";
             
             try (FileWriter writer = new FileWriter(resultFileName)) {
                 writer.write(result);
@@ -69,14 +69,13 @@ object JavaTemplates {
     val MAIN = """
         public class Main {
           public static void main(String[] args) throws Exception {
-            String testcaseType = args[0].toLowerCase();
-            MainUtils.readFromFileAndSaveInMap("/tmp/java/testcases/"+testcaseType+"-input"+args[1]+".txt");
+            MainUtils.readFromFileAndSaveInMap("/tmp/testcase.txt");
             
             // Your code starts here
             
             // Your code ends here
             
-            MainUtils.writeResults(String.valueOf(eResult), String.valueOf(result), args[1]);
+            MainUtils.writeResults(String.valueOf(eResult), String.valueOf(result));
           }
         }
     """.trimIndent()

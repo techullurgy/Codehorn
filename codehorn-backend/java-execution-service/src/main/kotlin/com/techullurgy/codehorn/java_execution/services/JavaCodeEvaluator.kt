@@ -12,6 +12,7 @@ import java.util.concurrent.TimeoutException
 
 internal class JavaCodeEvaluator(
     private val evaluationId: String,
+    private val envProvider: EnvProvider
 ): CodeEvaluator("evaluation/java/$evaluationId") {
 
     companion object {
@@ -21,6 +22,7 @@ internal class JavaCodeEvaluator(
 
     private val codeClient by lazy {
         CodeExecutorClient(
+            envProvider = envProvider,
             baseImage = BASE_IMAGE,
             workingDirInContainer = WORKING_DIR_IN_CONTAINER,
         )

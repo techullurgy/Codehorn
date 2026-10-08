@@ -1,14 +1,12 @@
 package com.techullurgy.codehorn.python_execution.services
 
 
-import com.techullurgy.codehorn.common.code.execution.services.CodeEvaluator
-import com.techullurgy.codehorn.common.code.execution.services.CompilationResult
-import com.techullurgy.codehorn.common.code.execution.services.EvaluationRequest
-import com.techullurgy.codehorn.common.code.execution.services.RunResult
+import com.techullurgy.codehorn.common.code.execution.services.*
 import com.techullurgy.codehorn.common.code.execution.services.client.CodeExecutorClient
 
-class PythonCodeEvaluator(
-    private val evaluationId: String
+internal class PythonCodeEvaluator(
+    evaluationId: String,
+    private val envProvider: EnvProvider
 ) : CodeEvaluator("evaluation/python/$evaluationId") {
     companion object {
         private const val BASE_IMAGE = "python:25"
@@ -17,6 +15,7 @@ class PythonCodeEvaluator(
 
     private val codeClient by lazy {
         CodeExecutorClient(
+            envProvider = envProvider,
             baseImage = BASE_IMAGE,
             workingDirInContainer = WORKING_DIR_IN_CONTAINER
         )

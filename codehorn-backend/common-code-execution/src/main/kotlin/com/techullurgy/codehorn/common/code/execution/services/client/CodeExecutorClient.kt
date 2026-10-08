@@ -11,6 +11,7 @@ import com.github.dockerjava.core.DefaultDockerClientConfig
 import com.github.dockerjava.core.DockerClientImpl
 import com.github.dockerjava.httpclient5.ApacheDockerHttpClient
 import com.github.dockerjava.transport.DockerHttpClient
+import com.techullurgy.codehorn.common.code.execution.services.EnvProvider
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream
 import java.io.Closeable
 import java.io.File
@@ -21,16 +22,17 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
 
 class CodeExecutorClient(
+    envProvider: EnvProvider,
     private val baseImage: String,
     private val workingDirInContainer: String = "/tmp",
     private val memory: Long = 512 * 1024 * 1024L,  // 512MB RAM
     private val memorySwap: Long = 512 * 1024 * 1024L, // No extra swap storage
-    private val nanoCpus: Long = 1_000_000_000L // 1 vCPUs
+    private val nanoCpus: Long = 1_000_000_000L, // 1 vCPUs
 ) {
     private val dockerClient: DockerClient
 
     init {
-        val dockerHost = System.getenv("TEMP_DOCKER_HOST") ?: DOCKER_HOST
+        val dockerHost = envProvider.get("APP_DOCKER_HOST") ?: DOCKER_HOST
 
         val config = DefaultDockerClientConfig.createDefaultConfigBuilder()
             .withDockerHost(dockerHost)

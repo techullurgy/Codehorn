@@ -35,7 +35,7 @@ data class TestcaseType(
                         TestcaseDataType.DOUBLE -> TestcaseTypeMasks.DOUBLE_TYPE
                         TestcaseDataType.STRING -> TestcaseTypeMasks.STRING_TYPE
                     }
-                    ) or (
+            ) or (
                     when(collectionType) {
                         TestcaseCollectionType.SINGLE -> TestcaseTypeMasks.SINGLE_TYPE
                         TestcaseCollectionType.LIST -> TestcaseTypeMasks.LIST_TYPE
@@ -44,7 +44,7 @@ data class TestcaseType(
                         TestcaseCollectionType.LIST_NULL -> TestcaseTypeMasks.LIST_NULL_TYPE
                         TestcaseCollectionType.LIST_LIST_NULL -> TestcaseTypeMasks.LIST_LIST_NULL_TYPE
                     }
-                    )
+            )
         }
 
     companion object {
