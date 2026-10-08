@@ -21,7 +21,7 @@ class CodeEvaluationService(
                 FileService.writeFile(evaluator.srcFile, fileContent)
 
                 testcases.forEach {
-                    FileService.writeFile("${evaluator.root}/testcase_${it.id}.txt", it.testcase)
+                    FileService.writeFile("${evaluator.root}/testcase_${it.id}/testcase.txt", it.testcase)
                 }
 
                 val request = EvaluationRequest(

@@ -186,8 +186,8 @@ internal class JavaCodeEvaluator(
     private fun uploadTestcase(containerId: ContainerId, testcase: ParsedTestcase) {
         codeClient.uploadFile(
             containerId = containerId,
-            hostAbsolutePath = "$rootDir/testcase_${testcase.id}.txt",
-            containerPath = "$WORKING_DIR_IN_CONTAINER/testcase.txt"
+            hostAbsolutePath = "$rootDir/testcase_${testcase.id}/testcase.txt",
+            containerPath = "$WORKING_DIR_IN_CONTAINER/"
         )
     }
 }
