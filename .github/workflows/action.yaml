@@ -42,4 +42,4 @@ jobs:
 
       - name: Run Tests with Console Output
         working-directory: codehorn-backend
-        run: ./gradlew :java-execution-service:test --info --console=plain
+        run: ./gradlew :java-execution-service:test --console=plain
