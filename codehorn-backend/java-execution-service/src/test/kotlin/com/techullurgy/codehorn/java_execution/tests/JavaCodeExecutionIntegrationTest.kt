@@ -80,6 +80,36 @@ class JavaCodeExecutionIntegrationTest {
                             collectionType = TestcaseCollectionType.SINGLE
                         ),
                     ).map { it.mask }
+                ),
+                ProblemTestcase(
+                    id = "2",
+                    inputNames = listOf("x", "y"),
+                    inputs = listOf("89", "-182"),
+                    masks = listOf(
+                        TestcaseType(
+                            dataType = TestcaseDataType.INT,
+                            collectionType = TestcaseCollectionType.SINGLE
+                        ),
+                        TestcaseType(
+                            dataType = TestcaseDataType.INT,
+                            collectionType = TestcaseCollectionType.SINGLE
+                        ),
+                    ).map { it.mask }
+                ),
+                ProblemTestcase(
+                    id = "3",
+                    inputNames = listOf("x", "y"),
+                    inputs = listOf("92783", "78884"),
+                    masks = listOf(
+                        TestcaseType(
+                            dataType = TestcaseDataType.INT,
+                            collectionType = TestcaseCollectionType.SINGLE
+                        ),
+                        TestcaseType(
+                            dataType = TestcaseDataType.INT,
+                            collectionType = TestcaseCollectionType.SINGLE
+                        ),
+                    ).map { it.mask }
                 )
             ).map { pb ->
                 ParsedTestcase(
