@@ -91,11 +91,13 @@ class JavaCodeExecutionIntegrationTest {
             val fileContent = TEST_FILE_CONTENT
 
             runBlocking {
-                codeEvaluationService.evaluateFor(
+                val results = codeEvaluationService.evaluateFor(
                     evaluationId = "test",
                     fileContent = fileContent,
                     testcases = parsedTestcases
                 )
+
+                println(results)
             }
         }
 
