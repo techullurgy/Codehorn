@@ -186,7 +186,7 @@ class JavaCodeExecutionIntegrationTest {
                         public int addTwoNumbers(int x, int y) {
                             System.out.println("Answer is " + (x+y));
                             if(x == 89) {
-                                x / 0; // Divide by Zero
+                                int unused = x / 0; // Divide by Zero
                             }
                             return x + y;
                         }
