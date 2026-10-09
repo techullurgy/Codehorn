@@ -28,12 +28,12 @@ object TestFileContent {
                         int x = MainUtils.getInteger();
                         int y = MainUtils.getInteger();
                         
-                        int eResult = new OriginalSolution().addTwoNumbers(x,y);
-                        int result = new Solution().addTwoNumbers(x,y);
+                        int expected = new OriginalSolution().addTwoNumbers(x,y);
+                        MainUtils.writeExpected(expected);
+                        int actual = new Solution().addTwoNumbers(x,y);
+                        MainUtils.writeActual(actual);
                         
-                        MainUtils.writeResults(String.valueOf(eResult), String.valueOf(result));
-                        
-                        if(eResult == result) {
+                        if(expected == actual) {
                             // Accepted
                             System.exit(acceptedCode);
                         } else {

@@ -47,18 +47,21 @@ object JavaTemplates {
             return ans;
           }
           
-          public static void writeResults(String eResult, String result) {
-            String resultFileName = "/tmp/actual.txt";
-            String eResultFileName = "/tmp/expected.txt";
+          public static void writeExpected(String value) {
+            String expectedResultFileName = "/tmp/expected.txt";
             
-            try (FileWriter writer = new FileWriter(resultFileName)) {
-                writer.write(result);
+            try (FileWriter writer = new FileWriter(expectedResultFileName)) {
+                writer.write(value);
             } catch (IOException e) {
                 e.printStackTrace();
             }
+          }
+          
+          public static void writeActual(String value) {
+            String actualResultFileName = "/tmp/actual.txt";
             
-            try (FileWriter writer = new FileWriter(eResultFileName)) {
-                writer.write(eResult);
+            try (FileWriter writer = new FileWriter(actualResultFileName)) {
+                writer.write(value);
             } catch (IOException e) {
                 e.printStackTrace();
             }

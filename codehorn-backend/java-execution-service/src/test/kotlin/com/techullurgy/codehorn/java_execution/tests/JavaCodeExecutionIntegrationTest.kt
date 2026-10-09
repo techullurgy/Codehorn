@@ -181,7 +181,7 @@ class JavaCodeExecutionIntegrationTest {
             val parsedTestcases = parsedTestcaseProvider(testcases)
 
             val fileContent = TestFileContent.AddTwoNumbers.buildWithUserCode(
-                """   
+                """
                     class Solution {
                         public int addTwoNumbers(int x, int y) {
                             System.out.println("Answer is " + (x+y));
@@ -201,7 +201,7 @@ class JavaCodeExecutionIntegrationTest {
                     testcases = parsedTestcases
                 )
 
-//                assertEquals(testcases.size, results.size)
+                assertEquals(testcases.size, results.size)
                 println(results)
             }
         }
