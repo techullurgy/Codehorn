@@ -133,4 +133,79 @@ class JavaCodeExecutionIntegrationTest {
 
         println("===== TOTAL TIME TAKEN : [$totalTimeTaken] milliseconds ======")
     }
+
+    @Test
+    fun compilationError() {
+        val totalTimeTaken = measureTimeMillis {
+            val testcases = listOf(
+                listOf("29", "54"),
+                listOf("89", "-182"),
+                listOf("92783", "78884"),
+            )
+            val parsedTestcases = parsedTestcaseProvider(testcases)
+
+            val fileContent = TestFileContent.AddTwoNumbers.buildWithUserCode(
+                """   
+                    class Solution {
+                        public int addTwoNumbers(int x, int y) {
+                            System.out.println("Answer is " + (x+y))
+                            return x + y;
+                        }
+                    }
+                """.trimIndent()
+            )
+
+            runBlocking {
+                val results = codeEvaluationService.evaluateFor(
+                    evaluationId = "test",
+                    fileContent = fileContent,
+                    testcases = parsedTestcases
+                )
+
+                assertEquals(testcases.size, results.size)
+                println(results)
+            }
+        }
+
+        println("===== TOTAL TIME TAKEN : [$totalTimeTaken] milliseconds ======")
+    }
+
+    @Test
+    fun runtimeError() {
+        val totalTimeTaken = measureTimeMillis {
+            val testcases = listOf(
+                listOf("29", "54"),
+                listOf("89", "-182"),
+                listOf("92783", "78884"),
+            )
+            val parsedTestcases = parsedTestcaseProvider(testcases)
+
+            val fileContent = TestFileContent.AddTwoNumbers.buildWithUserCode(
+                """   
+                    class Solution {
+                        public int addTwoNumbers(int x, int y) {
+                            System.out.println("Answer is " + (x+y));
+                            if(x == 89) {
+                                x / 0; // Divide by Zero
+                            }
+                            return x + y;
+                        }
+                    }
+                """.trimIndent()
+            )
+
+            runBlocking {
+                val results = codeEvaluationService.evaluateFor(
+                    evaluationId = "test",
+                    fileContent = fileContent,
+                    testcases = parsedTestcases
+                )
+
+                assertEquals(testcases.size, results.size)
+                println(results)
+            }
+        }
+
+        println("===== TOTAL TIME TAKEN : [$totalTimeTaken] milliseconds ======")
+    }
 }
