@@ -4,6 +4,7 @@ import com.github.dockerjava.api.DockerClient
 import com.github.dockerjava.api.async.ResultCallback
 import com.github.dockerjava.api.command.WaitContainerResultCallback
 import com.github.dockerjava.api.exception.DockerClientException
+import com.github.dockerjava.api.exception.NotFoundException
 import com.github.dockerjava.api.model.Frame
 import com.github.dockerjava.api.model.HostConfig
 import com.github.dockerjava.api.model.StreamType
@@ -168,22 +169,23 @@ class CodeExecutorClient(
         containerId: ContainerId,
         containerFilePath: String,
     ): String {
-        return dockerClient.copyArchiveFromContainerCmd(containerId.id, containerFilePath)
-            .exec()
-            .use { input ->
-                TarArchiveInputStream(input).use { tais ->
-                    val tarEntry = tais.nextEntry ?: throw NoSuchFileException(
-                        file = File(containerFilePath),
-                        reason = "File ($containerFilePath) not found in the container (${containerId.id})"
-                    )
+        return try {
+            dockerClient.copyArchiveFromContainerCmd(containerId.id, containerFilePath)
+                .exec()
+                .use { input ->
+                    TarArchiveInputStream(input).use { tais ->
+                        val tarEntry = tais.nextEntry
 
-                    if(tarEntry.isDirectory) {
-                        throw IllegalStateException("Tar Entry is Directory ${tarEntry.name}, and we expect single file")
+                        if(tarEntry.isDirectory) {
+                            throw IllegalStateException("Tar Entry is Directory ${tarEntry.name}, and we expect single file")
+                        }
+
+                        tais.readBytes().toString(StandardCharsets.UTF_8)
                     }
-
-                    tais.readBytes().toString(StandardCharsets.UTF_8)
                 }
-            }
+        } catch (e: NotFoundException) {
+            throw NoSuchFileException(File(containerFilePath), reason = e.message)
+        }
     }
 
     fun removeContainer(containerId: ContainerId) {
