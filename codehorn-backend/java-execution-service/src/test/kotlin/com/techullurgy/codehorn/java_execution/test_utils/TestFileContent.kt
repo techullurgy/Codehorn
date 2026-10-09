@@ -29,9 +29,9 @@ object TestFileContent {
                         int y = MainUtils.getInteger();
                         
                         int expected = new OriginalSolution().addTwoNumbers(x,y);
-                        MainUtils.writeExpected(expected);
+                        MainUtils.writeExpected(String.valueOf(expected));
                         int actual = new Solution().addTwoNumbers(x,y);
-                        MainUtils.writeActual(actual);
+                        MainUtils.writeActual(String.valueOf(actual));
                         
                         if(expected == actual) {
                             // Accepted
