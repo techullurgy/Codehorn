@@ -10,14 +10,18 @@ import com.techullurgy.codehorn.common.models.TestcaseCollectionType
 import com.techullurgy.codehorn.common.models.TestcaseDataType
 import com.techullurgy.codehorn.common.models.TestcaseType
 import com.techullurgy.codehorn.java_execution.services.JavaCodeEvaluatorFactory
+import com.techullurgy.codehorn.java_execution.test_utils.TestEnvProvider
+import com.techullurgy.codehorn.java_execution.test_utils.TestFileContent
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.testcontainers.containers.GenericContainer
 import org.testcontainers.containers.wait.strategy.Wait
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
 import org.testcontainers.utility.DockerImageName
+import kotlin.collections.mapIndexed
 import kotlin.system.measureTimeMillis
 import kotlin.test.assertEquals
 
@@ -47,59 +51,33 @@ class JavaCodeExecutionIntegrationTest {
         }
     }
 
-    @Test
-    fun basicTest() {
+    private lateinit var codeEvaluationService: CodeEvaluationService
+
+    private lateinit var parsedTestcaseProvider: (List<List<String>>) -> List<ParsedTestcase>
+
+    @BeforeEach
+    fun setup() {
         val dockerHostPort = dindContainer.getMappedPort(2375)
         val dockerHost = "tcp://${dindContainer.host}:$dockerHostPort"
 
-        val totalTimeTaken = measureTimeMillis {
-            val codeEvaluationService = CodeEvaluationService(
-                codeEvaluatorFactory = JavaCodeEvaluatorFactory(
-                    envProvider = TestEnvProvider(
-                        envMap = mapOf(
-                            "APP_DOCKER_HOST" to dockerHost,
-                        )
+        codeEvaluationService = CodeEvaluationService(
+            codeEvaluatorFactory = JavaCodeEvaluatorFactory(
+                envProvider = TestEnvProvider(
+                    envMap = mapOf(
+                        "APP_DOCKER_HOST" to dockerHost,
                     )
-                ),
-            )
+                )
+            ),
+        )
 
-            val testcaseParserStrategy = CodehornTestcaseParserStrategy()
+        val testcaseParserStrategy = CodehornTestcaseParserStrategy()
 
-            val parsedTestcases = listOf(
+        parsedTestcaseProvider = {
+            it.mapIndexed { index, inputs ->
                 ProblemTestcase(
-                    id = "1",
+                    id = "${index+1}",
                     inputNames = listOf("x", "y"),
-                    inputs = listOf("23", "56"),
-                    masks = listOf(
-                        TestcaseType(
-                            dataType = TestcaseDataType.INT,
-                            collectionType = TestcaseCollectionType.SINGLE
-                        ),
-                        TestcaseType(
-                            dataType = TestcaseDataType.INT,
-                            collectionType = TestcaseCollectionType.SINGLE
-                        ),
-                    ).map { it.mask }
-                ),
-                ProblemTestcase(
-                    id = "2",
-                    inputNames = listOf("x", "y"),
-                    inputs = listOf("89", "-182"),
-                    masks = listOf(
-                        TestcaseType(
-                            dataType = TestcaseDataType.INT,
-                            collectionType = TestcaseCollectionType.SINGLE
-                        ),
-                        TestcaseType(
-                            dataType = TestcaseDataType.INT,
-                            collectionType = TestcaseCollectionType.SINGLE
-                        ),
-                    ).map { it.mask }
-                ),
-                ProblemTestcase(
-                    id = "3",
-                    inputNames = listOf("x", "y"),
-                    inputs = listOf("92783", "78884"),
+                    inputs = inputs,
                     masks = listOf(
                         TestcaseType(
                             dataType = TestcaseDataType.INT,
@@ -111,14 +89,35 @@ class JavaCodeExecutionIntegrationTest {
                         ),
                     ).map { it.mask }
                 )
-            ).map { pb ->
+            }.map { pb ->
                 ParsedTestcase(
                     id = pb.id,
                     testcase = testcaseParserStrategy.parse(pb)
                 )
             }
+        }
+    }
 
-            val fileContent = TEST_FILE_CONTENT
+    @Test
+    fun allTestcaseShouldBeAccepted() {
+        val totalTimeTaken = measureTimeMillis {
+            val testcases = listOf(
+                listOf("29", "54"),
+                listOf("89", "-182"),
+                listOf("92783", "78884"),
+            )
+            val parsedTestcases = parsedTestcaseProvider(testcases)
+
+            val fileContent = TestFileContent.AddTwoNumbers.buildWithUserCode(
+                """   
+                    class Solution {
+                        public int addTwoNumbers(int x, int y) {
+                            System.out.println("Answer is " + (x+y));
+                            return x + y;
+                        }
+                    }
+                """.trimIndent()
+            )
 
             runBlocking {
                 val results = codeEvaluationService.evaluateFor(
@@ -127,6 +126,7 @@ class JavaCodeExecutionIntegrationTest {
                     testcases = parsedTestcases
                 )
 
+                assertEquals(testcases.size, results.size)
                 println(results)
             }
         }
@@ -134,54 +134,3 @@ class JavaCodeExecutionIntegrationTest {
         println("===== TOTAL TIME TAKEN : [$totalTimeTaken] milliseconds ======")
     }
 }
-
-private class TestEnvProvider(
-    private val envMap: Map<String, String>
-): EnvProvider {
-    override fun get(name: String): String? = envMap[name]
-}
-
-// Add Two Numbers (Java)
-private val TEST_FILE_CONTENT = """
-    ${JavaTemplates.IMPORTS}
-    
-    ${JavaTemplates.UTILS}
-    
-    class OriginalSolution {
-        public int addTwoNumbers(int x, int y) {
-            return x + y;
-        }
-    }
-    
-    class Solution {
-        public int addTwoNumbers(int x, int y) {
-            System.out.println("Answer is " + (x+y));
-            return x + y;
-        }
-    }
-    
-    public class Main {
-        public static void main(String[] args) throws Exception{
-            MainUtils.readFromFileAndSaveInMap("/tmp/testcase.txt");
-            
-            int acceptedCode = Integer.parseInt(System.getenv("CODE_ACCEPTED"));
-            int wrongAnswerCode = Integer.parseInt(System.getenv("CODE_WRONG_ANSWER"));
-            
-            int x = MainUtils.getInteger();
-            int y = MainUtils.getInteger();
-            
-            int eResult = new OriginalSolution().addTwoNumbers(x,y);
-            int result = new Solution().addTwoNumbers(x,y);
-            
-            MainUtils.writeResults(String.valueOf(eResult), String.valueOf(result));
-            
-            if(eResult == result) {
-                // Accepted
-                System.exit(acceptedCode);
-            } else {
-                // Wrong Answer
-                System.exit(wrongAnswerCode);
-            }
-        }
-    }
-""".trimIndent()
