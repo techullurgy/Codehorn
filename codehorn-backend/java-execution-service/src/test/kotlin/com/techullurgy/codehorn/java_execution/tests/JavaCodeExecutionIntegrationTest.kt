@@ -121,7 +121,7 @@ class JavaCodeExecutionIntegrationTest {
 
             runBlocking {
                 val results = codeEvaluationService.evaluateFor(
-                    evaluationId = "test",
+                    evaluationId = "test1",
                     fileContent = fileContent,
                     testcases = parsedTestcases
                 )
@@ -157,7 +157,7 @@ class JavaCodeExecutionIntegrationTest {
 
             runBlocking {
                 val results = codeEvaluationService.evaluateFor(
-                    evaluationId = "test",
+                    evaluationId = "test2",
                     fileContent = fileContent,
                     testcases = parsedTestcases
                 )
@@ -196,7 +196,7 @@ class JavaCodeExecutionIntegrationTest {
 
             runBlocking {
                 val results = codeEvaluationService.evaluateFor(
-                    evaluationId = "test",
+                    evaluationId = "test3",
                     fileContent = fileContent,
                     testcases = parsedTestcases
                 )
