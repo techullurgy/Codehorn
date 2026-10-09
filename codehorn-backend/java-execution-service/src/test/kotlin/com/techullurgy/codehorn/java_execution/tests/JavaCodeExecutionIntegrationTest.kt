@@ -217,7 +217,9 @@ class JavaCodeExecutionIntegrationTest {
                     class Solution {
                         public int addTwoNumbers(int x, int y) {
                             System.out.println("Answer is " + (x+y));
-                            while(true) {  }
+                            if(x == 89) {
+                                while(true) {}
+                            }
                             return x + y;
                         }
                     }
