@@ -2,13 +2,7 @@ package com.techullurgy.codehorn.java_execution.tests
 
 import com.techullurgy.codehorn.common.code.execution.parsers.CodehornTestcaseParserStrategy
 import com.techullurgy.codehorn.common.code.execution.services.CodeEvaluationService
-import com.techullurgy.codehorn.common.code.execution.services.EnvProvider
-import com.techullurgy.codehorn.common.code.execution.services.templates.utils.JavaTemplates
-import com.techullurgy.codehorn.common.models.ParsedTestcase
-import com.techullurgy.codehorn.common.models.ProblemTestcase
-import com.techullurgy.codehorn.common.models.TestcaseCollectionType
-import com.techullurgy.codehorn.common.models.TestcaseDataType
-import com.techullurgy.codehorn.common.models.TestcaseType
+import com.techullurgy.codehorn.common.models.*
 import com.techullurgy.codehorn.java_execution.services.JavaCodeEvaluatorFactory
 import com.techullurgy.codehorn.java_execution.test_utils.TestEnvProvider
 import com.techullurgy.codehorn.java_execution.test_utils.TestFileContent
@@ -21,7 +15,6 @@ import org.testcontainers.containers.wait.strategy.Wait
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
 import org.testcontainers.utility.DockerImageName
-import kotlin.collections.mapIndexed
 import kotlin.system.measureTimeMillis
 import kotlin.test.assertEquals
 
@@ -188,6 +181,43 @@ class JavaCodeExecutionIntegrationTest {
                             if(x == 89) {
                                 int unused = x / 0; // Divide by Zero
                             }
+                            return x + y;
+                        }
+                    }
+                """.trimIndent()
+            )
+
+            runBlocking {
+                val results = codeEvaluationService.evaluateFor(
+                    evaluationId = "test3",
+                    fileContent = fileContent,
+                    testcases = parsedTestcases
+                )
+
+//                assertEquals(testcases.size, results.size)
+                println(results)
+            }
+        }
+
+        println("===== TOTAL TIME TAKEN : [$totalTimeTaken] milliseconds ======")
+    }
+
+    @Test
+    fun timeLimitExceeded() {
+        val totalTimeTaken = measureTimeMillis {
+            val testcases = listOf(
+                listOf("29", "54"),
+                listOf("89", "-182"),
+                listOf("92783", "78884"),
+            )
+            val parsedTestcases = parsedTestcaseProvider(testcases)
+
+            val fileContent = TestFileContent.AddTwoNumbers.buildWithUserCode(
+                """
+                    class Solution {
+                        public int addTwoNumbers(int x, int y) {
+                            System.out.println("Answer is " + (x+y));
+                            while(true) {  }
                             return x + y;
                         }
                     }
