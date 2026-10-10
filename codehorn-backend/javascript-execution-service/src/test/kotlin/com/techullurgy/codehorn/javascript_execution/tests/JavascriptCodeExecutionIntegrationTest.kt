@@ -177,7 +177,7 @@ class JavascriptCodeExecutionIntegrationTest {
                     function addTwoNumbers(x, y) {
                       console.log("Answer is " + (x+y))
                       if(x == 89) {
-                        let unused = x / 0;
+                        undefinedFunction()
                       }
                       return x+y
                     }

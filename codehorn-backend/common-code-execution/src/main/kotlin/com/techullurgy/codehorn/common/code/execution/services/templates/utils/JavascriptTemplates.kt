@@ -1,7 +1,7 @@
 package com.techullurgy.codehorn.common.code.execution.services.templates.utils
 
 object JavascriptTemplates {
-    val UTILS = """
+    const val UTILS = """
         class MainUtils {
           static inputMap = {};
           static lineIndex = 1;
@@ -48,9 +48,9 @@ object JavascriptTemplates {
             fs.writeFileSync(actualPath, value);
           }
         }
-    """.trimIndent()
+    """
 
-    val MAIN = """
+    const val MAIN = """
         (async () => {
           await MainUtils.readFromFileAndSaveInMap("/tmp/testcase.txt")
           
@@ -61,11 +61,11 @@ object JavascriptTemplates {
           
           // Your code ends here
         })()
-    """.trimIndent()
+    """
 
-    val IMPORTS = """
+    const val IMPORTS = """
         const fs = require('node:fs');
         const path = require('node:path');
         const readline = require('node:readline')
-    """.trimIndent()
+    """
 }
