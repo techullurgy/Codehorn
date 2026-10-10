@@ -59,7 +59,6 @@ internal class JavascriptCodeEvaluator(
             }
         } catch (e: Throwable) {
             System.err.println("Error encountered during judge pipeline execution: EVAL_ID[$evaluationId] -> " + e.message)
-            e.printStackTrace()
             throw e
         } finally {
             if (containerId != null) {
@@ -127,7 +126,7 @@ internal class JavascriptCodeEvaluator(
                 )
             } catch (e: Throwable) {
                 System.err.println("Error encountered during judge pipeline execution: " + e.message)
-                e.printStackTrace()
+                throw e
             } finally {
                 if (containerId != null) {
                     try {
