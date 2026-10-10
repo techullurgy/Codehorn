@@ -26,9 +26,9 @@ object TestFileContent {
                   const y = MainUtils.getInteger()
                   
                   const expected = original_AddTwoNumbers(x,y)
-                  MainUtils.writeExpected(expected)
+                  MainUtils.writeExpected(expected.toString(10))
                   const actual = addTwoNumbers(x,y)
-                  MainUtils.writeActual(actual)
+                  MainUtils.writeActual(actual.toString(10))
                   
                   if(actual == expected) {
                     // Accepted
