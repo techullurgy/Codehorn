@@ -209,7 +209,7 @@ class PythonCodeExecutionIntegrationTest {
                     |  print("Answer is " + str(x+y))
                     |  if(x == 89):
                     |    while(True):
-                    |      
+                    |      pass
                     |  return x+y
                 """
             )
