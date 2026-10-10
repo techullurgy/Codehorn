@@ -161,7 +161,7 @@ internal class JavascriptCodeEvaluator(
     }
 
     private fun uploadJsFile(containerId: ContainerId) {
-        val absPath = File("$rootDir/Main.js").absolutePath
+        val absPath = File(srcFile).absolutePath
         codeClient.uploadFile(
             containerId = containerId,
             hostAbsolutePath = absPath,

@@ -19,6 +19,8 @@ object TestFileContent {
                 (async () => {
                   await MainUtils.readFromFileAndSaveInMap("/tmp/testcase.txt")
                   
+                  console.log("GOOOOOOOOD")
+                  
                   const codeAccepted = parseInt(process.env.CODE_ACCEPTED, 10)
                   const codeWrongAnswer = parseInt(process.env.CODE_WRONG_ANSWER, 10)
                   
