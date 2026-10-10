@@ -26,14 +26,16 @@ object CppTemplates {
             static int getInteger() {
                 return std::stoi(input_map[line_index++]);
             }
-
-            static void writeOutputs(const std::string& eResult, const std::string& result, const std::string& tNo) {
-                std::ofstream expected("outputs/eResult"+tNo+".txt");
-                expected << eResult;
+            
+            static void writeExpected(const std::string& value) {
+                std::ofstream expected("/tmp/expected.txt")
+                expected << value;
                 expected.close();
-
-                std::ofstream actual("outputs/result"+tNo+".txt");
-                actual << result;
+            }
+            
+            static void writeActual(const std::string& value) {
+                std::ofstream actual("/tmp/actual.txt")
+                actual << value;
                 actual.close();
             }
         };
@@ -49,19 +51,14 @@ object CppTemplates {
 
     val MAIN = """
         int main(int argc, char* argv[]) {
-            std::string testcaseType = toLowerCase(argv[1]);
-            std::string tNo = argv[2];
-
-            std::string inputFile = "/tmp/cpp/testcases/" + testcaseType + "-input" + tNo + ".txt";
-            MainUtils::readFromFileAndSaveInMap(inputFile);
+            MainUtils::readFromFileAndSaveInMap("/tmp/testcase.txt");
+            
+            int acceptedCode = (int) getenv("CODE_ACCEPTED");
+            int wrongAnswerCode = (int) getenv("CODE_WRONG_ANSWER");
 
             // Your code starts here
 
             // Your code ends here
-
-            MainUtils::writeOutputs("", "", tNo);
-
-            return 0;
         }
     """.trimIndent()
 
@@ -72,5 +69,6 @@ object CppTemplates {
         #include <string>
         #include <cctype>
         #include <algorithm>
+        #include <stdlib>
     """.trimIndent()
 }

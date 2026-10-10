@@ -1,4 +1,4 @@
-name: Java Execution Service Test
+name: Code Execution Service Test
 
 on:
   push:
@@ -40,6 +40,10 @@ jobs:
         working-directory: codehorn-backend
         run: chmod +x gradlew
 
-      - name: Run Tests with Console Output
+      - name: Run Java Tests with Console Output
         working-directory: codehorn-backend
         run: ./gradlew :java-execution-service:test --console=plain
+
+      - name: Run Cpp Tests with Console Output
+        working-directory: codehorn-backend
+        run: ./gradlew :cpp-execution-service:test --console=plain

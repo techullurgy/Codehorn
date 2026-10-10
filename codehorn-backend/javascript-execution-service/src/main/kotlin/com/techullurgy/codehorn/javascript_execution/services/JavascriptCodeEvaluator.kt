@@ -12,7 +12,7 @@ internal class JavascriptCodeEvaluator(
     private val envProvider: EnvProvider
 ) : CodeEvaluator("evaluation/javascript/$evaluationId") {
     companion object {
-        private const val BASE_IMAGE = "node:25"
+        private const val BASE_IMAGE = "node:26.11.1-slim"
         private const val WORKING_DIR_IN_CONTAINER = "/tmp"
     }
 

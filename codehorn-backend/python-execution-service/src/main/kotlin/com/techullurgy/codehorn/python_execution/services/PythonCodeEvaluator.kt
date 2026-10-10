@@ -9,7 +9,7 @@ internal class PythonCodeEvaluator(
     private val envProvider: EnvProvider
 ) : CodeEvaluator("evaluation/python/$evaluationId") {
     companion object {
-        private const val BASE_IMAGE = "python:25"
+        private const val BASE_IMAGE = "python:3.12.15-slim"
         private const val WORKING_DIR_IN_CONTAINER = "/tmp"
     }
 

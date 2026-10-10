@@ -21,4 +21,6 @@ dependencies {
 
     implementation(platform(libs.spring.cloud.bom))
     implementation(libs.spring.cloud.starter.consul.discovery)
+
+    testImplementation(libs.testcontainers.junit.jupiter)
 }

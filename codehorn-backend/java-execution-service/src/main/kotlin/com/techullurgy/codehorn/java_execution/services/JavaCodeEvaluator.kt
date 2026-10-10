@@ -16,7 +16,7 @@ internal class JavaCodeEvaluator(
 ): CodeEvaluator("evaluation/java/$evaluationId") {
 
     companion object {
-        private const val BASE_IMAGE = "amazoncorretto:25"
+        const val BASE_IMAGE = "amazoncorretto:25"
         private const val WORKING_DIR_IN_CONTAINER = "/tmp"
     }
 
@@ -41,7 +41,7 @@ internal class JavaCodeEvaluator(
 
             codeClient.uploadFile(
                 containerId = containerId,
-                hostAbsolutePath = File("$rootDir/Main.java").absolutePath,
+                hostAbsolutePath = File(srcFile).absolutePath,
                 containerPath = "$WORKING_DIR_IN_CONTAINER/"
             )
 
@@ -130,7 +130,7 @@ internal class JavaCodeEvaluator(
                         stderr = logStream.stderr,
                     )
                 )
-            }catch (e: Throwable) {
+            } catch (e: Throwable) {
                 System.err.println("Error encountered during judge pipeline execution: " + e.message);
                 e.printStackTrace()
             } finally {
@@ -162,7 +162,7 @@ internal class JavaCodeEvaluator(
 
     private fun extractRunExitCode(containerId: ContainerId): Int {
         return try {
-            codeClient.waitForContainer(containerId, 60)
+            codeClient.waitForContainer(containerId, 6)
         } catch (_: TimeoutException) { CODE_TIME_LIMIT_EXCEEDED }
     }
 

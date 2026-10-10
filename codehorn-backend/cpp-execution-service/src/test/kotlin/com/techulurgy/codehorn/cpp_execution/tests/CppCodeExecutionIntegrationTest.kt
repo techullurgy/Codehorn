@@ -1,12 +1,16 @@
-package com.techullurgy.codehorn.java_execution.tests
+package com.techulurgy.codehorn.cpp_execution.tests
 
 import com.techullurgy.codehorn.common.code.execution.parsers.CodehornTestcaseParserStrategy
 import com.techullurgy.codehorn.common.code.execution.services.CodeEvaluationService
-import com.techullurgy.codehorn.common.models.*
-import com.techullurgy.codehorn.java_execution.services.JavaCodeEvaluator
-import com.techullurgy.codehorn.java_execution.services.JavaCodeEvaluatorFactory
-import com.techullurgy.codehorn.java_execution.test_utils.TestEnvProvider
-import com.techullurgy.codehorn.java_execution.test_utils.TestFileContent
+import com.techullurgy.codehorn.common.models.ParsedTestcase
+import com.techullurgy.codehorn.common.models.ProblemTestcase
+import com.techullurgy.codehorn.common.models.TestcaseCollectionType
+import com.techullurgy.codehorn.common.models.TestcaseDataType
+import com.techullurgy.codehorn.common.models.TestcaseType
+import com.techullurgy.codehorn.cpp_execution.services.CppCodeEvaluator
+import com.techullurgy.codehorn.cpp_execution.services.CppCodeEvaluatorFactory
+import com.techulurgy.codehorn.cpp_execution.test_utils.TestEnvProvider
+import com.techulurgy.codehorn.cpp_execution.test_utils.TestFileContent
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -20,10 +24,9 @@ import kotlin.system.measureTimeMillis
 import kotlin.test.assertEquals
 
 @Testcontainers
-class JavaCodeExecutionIntegrationTest {
+class CppCodeExecutionIntegrationTest {
 
     companion object {
-
         @JvmStatic
         @Container
         private val dindContainer = GenericContainer(
@@ -38,7 +41,7 @@ class JavaCodeExecutionIntegrationTest {
         @BeforeAll
         fun beforeAll() {
             val dockerPull = dindContainer.execInContainer(
-                "docker", "pull", JavaCodeEvaluator.BASE_IMAGE
+                "docker", "pull", CppCodeEvaluator.BASE_IMAGE
             )
 
             assertEquals(0, dockerPull.exitCode, "Pre pull failed: ${dockerPull.stderr}")
@@ -55,7 +58,7 @@ class JavaCodeExecutionIntegrationTest {
         val dockerHost = "tcp://${dindContainer.host}:$dockerHostPort"
 
         codeEvaluationService = CodeEvaluationService(
-            codeEvaluatorFactory = JavaCodeEvaluatorFactory(
+            codeEvaluatorFactory = CppCodeEvaluatorFactory(
                 envProvider = TestEnvProvider(
                     envMap = mapOf(
                         "APP_DOCKER_HOST" to dockerHost,
@@ -104,11 +107,9 @@ class JavaCodeExecutionIntegrationTest {
 
             val fileContent = TestFileContent.AddTwoNumbers.buildWithUserCode(
                 """   
-                    class Solution {
-                        public int addTwoNumbers(int x, int y) {
-                            System.out.println("Answer is " + (x+y));
-                            return x + y;
-                        }
+                    int addTwoNumbers(int x, int y) {
+                        std::cout << "Answer is " << (x + y) << std::endl;
+                        return x + y;
                     }
                 """.trimIndent()
             )
@@ -139,12 +140,10 @@ class JavaCodeExecutionIntegrationTest {
             val parsedTestcases = parsedTestcaseProvider(testcases)
 
             val fileContent = TestFileContent.AddTwoNumbers.buildWithUserCode(
-                """   
-                    class Solution {
-                        public int addTwoNumbers(int x, int y) {
-                            System.out.println("Answer is " + (x+y))
-                            return x + y;
-                        }
+                """
+                    int addTwoNumbers(int x, int y) {
+                        std::cout << "Answer is " << (x + y) << std::endl
+                        return x + y;
                     }
                 """.trimIndent()
             )
@@ -176,14 +175,12 @@ class JavaCodeExecutionIntegrationTest {
 
             val fileContent = TestFileContent.AddTwoNumbers.buildWithUserCode(
                 """
-                    class Solution {
-                        public int addTwoNumbers(int x, int y) {
-                            System.out.println("Answer is " + (x+y));
-                            if(x == 89) {
-                                int unused = x / 0; // Divide by Zero
-                            }
-                            return x + y;
+                    int addTwoNumbers(int x, int y) {        
+                        std::cout << "Answer is " << (x + y) << std::endl;
+                        if(x == 89) {
+                            int unused = x / 0; // Divide by Zero
                         }
+                        return x + y;
                     }
                 """.trimIndent()
             )
@@ -215,14 +212,12 @@ class JavaCodeExecutionIntegrationTest {
 
             val fileContent = TestFileContent.AddTwoNumbers.buildWithUserCode(
                 """
-                    class Solution {
-                        public int addTwoNumbers(int x, int y) {
-                            System.out.println("Answer is " + (x+y));
-                            if(x == 89) {
-                                while(true) {}
-                            }
-                            return x + y;
+                    int addTwoNumbers(int x, int y) {
+                        std::cout << "Answer is " << (x + y) << std::endl;
+                        if(x == 89) {
+                            while(true) {}
                         }
+                        return x + y;
                     }
                 """.trimIndent()
             )
