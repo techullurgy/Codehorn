@@ -108,10 +108,10 @@ class PythonCodeExecutionIntegrationTest {
 
             val fileContent = TestFileContent.AddTwoNumbers.buildWithUserCode(
                 """
-                    def addTwoNumbers(x: int, y: int) -> int:
-                      print("Answer is " + str(x+y))
-                      return x+y
-                """.trimIndent()
+                    |def addTwoNumbers(x: int, y: int) -> int:
+                    |  print("Answer is " + str(x+y))
+                    |  return x+y
+                """
             )
 
             println("""FILE CONTENT START""")
