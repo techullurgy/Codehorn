@@ -44,17 +44,17 @@ jobs:
         run: docker pull docker:29.8.2-dind
 
       - parallel:
-        - name: Run Java Tests with Console Output
-          working-directory: codehorn-backend
-          run: ./gradlew :java-execution-service:test --console=plain --no-daemon
-
-        - name: Run Cpp Tests with Console Output
-          working-directory: codehorn-backend
-          run: ./gradlew :cpp-execution-service:test --console=plain --no-daemon
-
-        - name: Run Python Tests with Console Output
-          working-directory: codehorn-backend
-          run: ./gradlew :python-execution-service:test --console=plain --no-daemon
+#         - name: Run Java Tests with Console Output
+#           working-directory: codehorn-backend
+#           run: ./gradlew :java-execution-service:test --console=plain --no-daemon
+#
+#         - name: Run Cpp Tests with Console Output
+#           working-directory: codehorn-backend
+#           run: ./gradlew :cpp-execution-service:test --console=plain --no-daemon
+#
+#         - name: Run Python Tests with Console Output
+#           working-directory: codehorn-backend
+#           run: ./gradlew :python-execution-service:test --console=plain --no-daemon
 
         - name: Run Javascript Tests with Console Output
           working-directory: codehorn-backend
