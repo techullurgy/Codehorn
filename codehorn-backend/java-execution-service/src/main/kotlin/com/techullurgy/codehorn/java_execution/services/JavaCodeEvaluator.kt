@@ -150,7 +150,7 @@ internal class JavaCodeEvaluator(
 
     private fun createRunContainer(): ContainerId {
         return codeClient.createContainer(
-            "java", "Main",
+            "timeout", "-s", "KILL", "6s", "sh", "-c", "java Main",
             envs = listOf(
                 "$ENV_CODE_ACCEPTED=$CODE_ACCEPTED",
                 "$ENV_CODE_WRONG_ANSWER=$CODE_WRONG_ANSWER",

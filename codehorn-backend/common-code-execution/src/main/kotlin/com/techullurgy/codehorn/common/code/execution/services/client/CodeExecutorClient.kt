@@ -64,7 +64,6 @@ class CodeExecutorClient(
                 .withWorkingDir(workingDirInContainer)
                 .withCmd(*command)
                 .withEnv(envs)
-                .withStopTimeout(6)
                 .exec()
 
             ContainerId(containerResponse.id)

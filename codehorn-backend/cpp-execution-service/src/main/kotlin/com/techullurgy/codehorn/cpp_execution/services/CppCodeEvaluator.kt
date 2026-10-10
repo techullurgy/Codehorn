@@ -148,7 +148,7 @@ internal class CppCodeEvaluator(
 
     private fun createRunContainer(): ContainerId {
         return codeClient.createContainer(
-            "sh", "-c", "chmod +x ./runner && ./runner",
+            "timeout", "-s", "KILL", "6s", "sh", "-c", "chmod +x ./runner && ./runner",
             envs = listOf(
                 "$ENV_CODE_ACCEPTED=$CODE_ACCEPTED",
                 "$ENV_CODE_WRONG_ANSWER=$CODE_WRONG_ANSWER",
