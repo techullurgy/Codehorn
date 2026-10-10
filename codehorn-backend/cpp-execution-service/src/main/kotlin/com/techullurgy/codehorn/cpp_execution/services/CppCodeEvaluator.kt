@@ -60,7 +60,7 @@ internal class CppCodeEvaluator(
                 CompilationResult.Error(logStream.stderr)
             }
         } catch (e: Throwable) {
-            System.err.println("Error encountered during judge pipeline execution: EVAL_ID[$evaluationId] -> " + e.message);
+            System.err.println("Error encountered during judge pipeline execution: EVAL_ID[$evaluationId] -> " + e.message)
             e.printStackTrace()
             throw e
         } finally {
@@ -129,7 +129,7 @@ internal class CppCodeEvaluator(
                     )
                 )
             } catch (e: Throwable) {
-                System.err.println("Error encountered during judge pipeline execution: " + e.message);
+                System.err.println("Error encountered during judge pipeline execution: " + e.message)
                 e.printStackTrace()
             } finally {
                 if (containerId != null) {
