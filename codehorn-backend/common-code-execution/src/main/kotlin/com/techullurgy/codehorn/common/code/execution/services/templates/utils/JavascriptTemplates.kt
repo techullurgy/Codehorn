@@ -33,31 +33,29 @@ object JavascriptTemplates {
             MainUtils.lineIndex++;
             return ans;
           }
-
-          static writeOutputs(expectedResult, result, tNo) {
-            const expectedPath = path.join("outputs", "eResult"+tNo+".txt");
-            const resultPath = path.join("outputs", "result"+tNo+".txt");
-
-            fs.writeFileSync(expectedPath, expectedResult);
-            fs.writeFileSync(resultPath, result);
+          
+          static writeExpected(value) {
+            const expectedPath = "/tmp/expected.txt";
+            fs.writeFileSync(expectedPath, value);
+          }
+          
+          static writeActual(value) {
+            const actualPath = "/tmp/actual.txt";
+            fs.writeFileSync(actualPath, value);
           }
         }
     """.trimIndent()
 
     val MAIN = """
         (async () => {
-          const args = process.argv.slice(2)
-        
-          const testcaseType = args[0].toLowerCase()
-          const tNo = args[1]
-        
-          const testcasePath = `/tmp/javascript/testcases/${'$'}{testcaseType}-input${'$'}{tNo}.txt`
-          await MainUtils.readFromFileAndSaveInMap(testcasePath)
+          await MainUtils.readFromFileAndSaveInMap("/tmp/testcase.txt")
+          
+          let codeAccepted = parseInt(process.env.CODE_ACCEPTED, 10)
+          let codeWrongAnswer = parseInt(process.env.CODE_WRONG_ANSWER, 10)
           
           // Your code starts here
-          // Your code ends here
           
-          MainUtils.writeOutputs("", "", tNo);
+          // Your code ends here
         })()
     """.trimIndent()
 
