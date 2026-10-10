@@ -44,7 +44,7 @@ internal class CppCodeEvaluator(
 
             codeClient.startContainer(containerId)
 
-            val exitCode = codeClient.waitForContainer(containerId, 60)
+            val exitCode = codeClient.waitForContainer(containerId, 6)
 
             return if(exitCode == 0) {
                 codeClient.downloadFile(

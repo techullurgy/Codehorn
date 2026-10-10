@@ -19,8 +19,8 @@ object TestFileContent {
                 int main(int argc, char* argv[]) {
                     MainUtils::readFromFileAndSaveInMap("/tmp/testcase.txt");
                     
-                    int acceptedCode = (int) std::getenv("CODE_ACCEPTED");
-                    int wrongAnswerCode = (int) std::getenv("CODE_WRONG_ANSWER");
+                    int acceptedCode = std::stoi(std::getenv("CODE_ACCEPTED"));
+                    int wrongAnswerCode = std::stoi(std::getenv("CODE_WRONG_ANSWER"));
         
                     int x = MainUtils::getInteger();
                     int y = MainUtils::getInteger();

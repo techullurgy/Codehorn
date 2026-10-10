@@ -28,13 +28,13 @@ object CppTemplates {
             }
             
             static void writeExpected(const std::string& value) {
-                std::ofstream expected("/tmp/expected.txt")
+                std::ofstream expected("/tmp/expected.txt");
                 expected << value;
                 expected.close();
             }
             
             static void writeActual(const std::string& value) {
-                std::ofstream actual("/tmp/actual.txt")
+                std::ofstream actual("/tmp/actual.txt");
                 actual << value;
                 actual.close();
             }
@@ -53,8 +53,8 @@ object CppTemplates {
         int main(int argc, char* argv[]) {
             MainUtils::readFromFileAndSaveInMap("/tmp/testcase.txt");
             
-            int acceptedCode = (int) std::getenv("CODE_ACCEPTED");
-            int wrongAnswerCode = (int) std::getenv("CODE_WRONG_ANSWER");
+            int acceptedCode = std::stoi(std::getenv("CODE_ACCEPTED"));
+            int wrongAnswerCode = std::stoi(std::getenv("CODE_WRONG_ANSWER"));
 
             // Your code starts here
 
