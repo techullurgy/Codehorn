@@ -33,7 +33,7 @@ object PythonTemplates {
         |    filename = "/tmp/expected.txt"
         |
         |    with open(filename, "w") as file:
-        |     file.write(value)
+        |      file.write(value)
         |
         |  @staticmethod
         |  def writeActual(value):
