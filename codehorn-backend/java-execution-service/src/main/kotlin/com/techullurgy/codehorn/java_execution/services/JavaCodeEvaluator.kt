@@ -116,7 +116,7 @@ internal class JavaCodeEvaluator(
                         containerFilePath = "$WORKING_DIR_IN_CONTAINER/actual.txt"
                     )
                 } catch (e: NoSuchFileException) {
-                    e.printStackTrace()
+                    println(e.message)
                     ""
                 }
 

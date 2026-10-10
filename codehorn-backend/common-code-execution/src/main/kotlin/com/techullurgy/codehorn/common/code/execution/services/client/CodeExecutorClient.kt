@@ -49,7 +49,7 @@ class CodeExecutorClient(
     }
 
     fun createContainer(
-        vararg command: String, // "javac", "Main.java"
+        vararg command: String,
         envs: List<String> = emptyList(),
     ): ContainerId {
         return try {
@@ -64,6 +64,7 @@ class CodeExecutorClient(
                 .withWorkingDir(workingDirInContainer)
                 .withCmd(*command)
                 .withEnv(envs)
+                .withStopTimeout(6)
                 .exec()
 
             ContainerId(containerResponse.id)
