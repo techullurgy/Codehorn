@@ -7,18 +7,22 @@ object JavascriptTemplates {
           static lineIndex = 1;
 
           static async readFromFileAndSaveInMap(fileName) {
-              const fileStream = fs.createReadStream(fileName)
-              const rl = readline.createInterface({
-                input: fileStream,
-                crlfDelay: Infinity
-              })
-            
-              return new Promise(res => {
+              return new Promise((resolve, reject) => {
+                const fileStream = fs.createReadStream(fileName)
+                
+                fileStream.on('error', (err) => reject(err));
+                
+                const rl = readline.createInterface({
+                  input: fileStream,
+                  crlfDelay: Infinity
+                })
+                
                 rl.on('line', line => { MainUtils.inputMap[MainUtils.lineIndex++] = line })
                 rl.on('close', _ => {
                     MainUtils.lineIndex = 1
-                    res() 
+                    resolve() 
                 })
+                rl.on('error', (err) => reject(err));
               })
           }
 
