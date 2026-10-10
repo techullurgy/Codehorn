@@ -53,8 +53,8 @@ object CppTemplates {
         int main(int argc, char* argv[]) {
             MainUtils::readFromFileAndSaveInMap("/tmp/testcase.txt");
             
-            int acceptedCode = (int) getenv("CODE_ACCEPTED");
-            int wrongAnswerCode = (int) getenv("CODE_WRONG_ANSWER");
+            int acceptedCode = (int) std::getenv("CODE_ACCEPTED");
+            int wrongAnswerCode = (int) std::getenv("CODE_WRONG_ANSWER");
 
             // Your code starts here
 
@@ -69,6 +69,6 @@ object CppTemplates {
         #include <string>
         #include <cctype>
         #include <algorithm>
-        #include <stdlib>
+        #include <cstdlib>
     """.trimIndent()
 }
