@@ -111,8 +111,6 @@ class JavascriptCodeExecutionIntegrationTest {
                 """
             )
 
-            println(fileContent)
-
             runBlocking {
                 val results = codeEvaluationService.evaluateFor(
                     evaluationId = "test1",
