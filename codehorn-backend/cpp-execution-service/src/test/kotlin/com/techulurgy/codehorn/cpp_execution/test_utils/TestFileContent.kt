@@ -28,7 +28,7 @@ object TestFileContent {
                     int expected = original_addTwoNumbers(x, y);
                     MainUtils::writeExpected(std::to_string(expected));
                     int actual = addTwoNumbers(x, y);
-                    MainUtils::writeExpected(std::to_string(actual));
+                    MainUtils::writeActual(std::to_string(actual));
                     
                     if(expected == actual) {
                         return acceptedCode;
