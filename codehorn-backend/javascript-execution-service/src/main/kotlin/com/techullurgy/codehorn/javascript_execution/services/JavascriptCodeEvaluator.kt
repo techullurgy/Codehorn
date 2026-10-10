@@ -63,6 +63,9 @@ internal class JavascriptCodeEvaluator(
         } finally {
             if (containerId != null) {
                 try {
+                    val logStream = codeClient.extractLogStream(containerId)
+                    println("LOG STREAM: $logStream")
+
                     println("Cleaning up: Removing container... -> $containerId")
                     codeClient.removeContainer(containerId)
                 } catch (e: Exception) {
