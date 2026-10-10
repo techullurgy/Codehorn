@@ -40,10 +40,11 @@ jobs:
         working-directory: codehorn-backend
         run: chmod +x gradlew
 
-      - name: Run Java Tests with Console Output
-        working-directory: codehorn-backend
-        run: ./gradlew :java-execution-service:test --console=plain
+      - parallel:
+        - name: Run Java Tests with Console Output
+          working-directory: codehorn-backend
+          run: ./gradlew :java-execution-service:test --console=plain
 
-      - name: Run Cpp Tests with Console Output
-        working-directory: codehorn-backend
-        run: ./gradlew :cpp-execution-service:test --console=plain
+        - name: Run Cpp Tests with Console Output
+          working-directory: codehorn-backend
+          run: ./gradlew :cpp-execution-service:test --console=plain
