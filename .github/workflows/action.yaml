@@ -40,6 +40,9 @@ jobs:
         working-directory: codehorn-backend
         run: chmod +x gradlew
 
+      - name: Pre Pull Docker Dind
+        run: docker pull docker:29.8.2-dind
+
       - parallel:
         - name: Run Java Tests with Console Output
           working-directory: codehorn-backend
@@ -48,3 +51,11 @@ jobs:
         - name: Run Cpp Tests with Console Output
           working-directory: codehorn-backend
           run: ./gradlew :cpp-execution-service:test --console=plain
+
+        - name: Run Python Tests with Console Output
+          working-directory: codehorn-backend
+          run: ./gradlew :python-execution-service:test --console=plain
+
+        # - name: Run Javascript Tests with Console Output
+        #   working-directory: codehorn-backend
+        #   run: ./gradlew :javascript-execution-service:test --console=plain

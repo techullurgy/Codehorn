@@ -28,10 +28,12 @@ internal class JavascriptCodeEvaluator(
         get() = "$rootDir/Main.js"
 
     override fun compile(request: EvaluationRequest): CompilationResult {
+        // node --check Main.js
         return CompilationResult.Ok
     }
 
     override fun run(request: EvaluationRequest): Set<RunResult> {
+        // node Main.js
         return emptySet()
     }
 }

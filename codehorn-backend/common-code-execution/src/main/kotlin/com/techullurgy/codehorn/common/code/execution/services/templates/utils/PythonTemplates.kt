@@ -29,27 +29,30 @@ object PythonTemplates {
             return ans
           
           @staticmethod
-          def writeOutputs(eResult, result, tNo):
-            expected_result_filename = "outputs/eResult"+tNo+".txt"
-            result_filename = "outputs/result"+tNo+".txt"
-
-            with open(expected_result_filename, "w") as file:
-              file.write(eResult)
-
-            with open(result_filename, "w") as file:
-              file.write(result)
+          def writeExpected(value):
+            filename = "/tmp/expected.txt"
+            
+            with open(filename, "w") as file:
+              file.write(value)
+          
+          @staticmethod
+          def writeActual(value):
+            filename = "/tmp/actual.txt"
+            
+            with open(filename, "w") as file:
+              file.write(value)
     """.trimIndent()
 
     val MAIN = """
         def main():
-          testcaseType = sys.argv[1].lower()
-          tNo = sys.argv[2]
-          MainUtils.readFromFileAndSaveInDictionary("/tmp/python/testcases/"+testcaseType+"-input"+tNo+".txt")
+          MainUtils.readFromFileAndSaveInDictionary("/tmp/testcase.txt")
+          
+          accepted_code = os.getenv("CODE_ACCEPTED")
+          wrong_answer_code = os.getenv("CODE_WRONG_ANSWER")
         
           # Your code starts here
+          
           # Your code ends here
-        
-          MainUtils.writeOutputs("", "", tNo)
         
         if __name__ == "__main__":
           main()
@@ -57,5 +60,6 @@ object PythonTemplates {
 
     val IMPORTS = """
         import sys
+        import os
     """.trimIndent()
 }
