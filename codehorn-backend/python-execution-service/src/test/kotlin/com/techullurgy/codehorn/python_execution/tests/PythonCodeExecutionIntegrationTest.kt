@@ -114,6 +114,10 @@ class PythonCodeExecutionIntegrationTest {
                 """.trimIndent()
             )
 
+            println("""FILE CONTENT START""")
+            println(fileContent)
+            println("""FILE CONTENT END""")
+
             runBlocking {
                 val results = codeEvaluationService.evaluateFor(
                     evaluationId = "test1",

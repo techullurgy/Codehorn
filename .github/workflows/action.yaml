@@ -46,16 +46,16 @@ jobs:
       - parallel:
         - name: Run Java Tests with Console Output
           working-directory: codehorn-backend
-          run: ./gradlew :java-execution-service:test --console=plain
+          run: ./gradlew :java-execution-service:test --console=plain --no-daemon
 
         - name: Run Cpp Tests with Console Output
           working-directory: codehorn-backend
-          run: ./gradlew :cpp-execution-service:test --console=plain
+          run: ./gradlew :cpp-execution-service:test --console=plain --no-daemon
 
         - name: Run Python Tests with Console Output
           working-directory: codehorn-backend
-          run: ./gradlew :python-execution-service:test --console=plain
+          run: ./gradlew :python-execution-service:test --console=plain --no-daemon
 
         # - name: Run Javascript Tests with Console Output
         #   working-directory: codehorn-backend
-        #   run: ./gradlew :javascript-execution-service:test --console=plain
+        #   run: ./gradlew :javascript-execution-service:test --console=plain --no-daemon
