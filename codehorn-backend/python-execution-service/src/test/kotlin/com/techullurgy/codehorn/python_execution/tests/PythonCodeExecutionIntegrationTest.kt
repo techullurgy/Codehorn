@@ -2,11 +2,7 @@ package com.techullurgy.codehorn.python_execution.tests
 
 import com.techullurgy.codehorn.common.code.execution.parsers.CodehornTestcaseParserStrategy
 import com.techullurgy.codehorn.common.code.execution.services.CodeEvaluationService
-import com.techullurgy.codehorn.common.models.ParsedTestcase
-import com.techullurgy.codehorn.common.models.ProblemTestcase
-import com.techullurgy.codehorn.common.models.TestcaseCollectionType
-import com.techullurgy.codehorn.common.models.TestcaseDataType
-import com.techullurgy.codehorn.common.models.TestcaseType
+import com.techullurgy.codehorn.common.models.*
 import com.techullurgy.codehorn.python_execution.services.PythonCodeEvaluator
 import com.techullurgy.codehorn.python_execution.services.PythonCodeEvaluatorFactory
 import com.techullurgy.codehorn.python_execution.test_utils.TestEnvProvider
@@ -145,10 +141,10 @@ class PythonCodeExecutionIntegrationTest {
 
             val fileContent = TestFileContent.AddTwoNumbers.buildWithUserCode(
                 """
-                    def addTwoNumbers(x: int, y: int) -> int
-                      print("Answer is " + str(x+y))
-                      return x+y
-                """.trimIndent()
+                    |def addTwoNumbers(x: int, y: int) -> int
+                    |  print("Answer is " + str(x+y))
+                    |  return x+y
+                """
             )
 
             runBlocking {
@@ -178,12 +174,12 @@ class PythonCodeExecutionIntegrationTest {
 
             val fileContent = TestFileContent.AddTwoNumbers.buildWithUserCode(
                 """
-                    def addTwoNumbers(x: int, y: int) -> int:
-                      print("Answer is " + str(x+y))
-                      if(x == 89):
-                        unused = x/0
-                      return x+y
-                """.trimIndent()
+                    |def addTwoNumbers(x: int, y: int) -> int:
+                    |  print("Answer is " + str(x+y))
+                    |  if(x == 89):
+                    |    unused = x/0
+                    |  return x+y
+                """
             )
 
             runBlocking {
@@ -213,13 +209,13 @@ class PythonCodeExecutionIntegrationTest {
 
             val fileContent = TestFileContent.AddTwoNumbers.buildWithUserCode(
                 """
-                    def addTwoNumbers(x: int, y: int) -> int:
-                      print("Answer is " + str(x+y))
-                      if(x == 89):
-                        while(True):
-                          
-                      return x+y
-                """.trimIndent()
+                    |def addTwoNumbers(x: int, y: int) -> int:
+                    |  print("Answer is " + str(x+y))
+                    |  if(x == 89):
+                    |    while(True):
+                    |      
+                    |  return x+y
+                """
             )
 
             runBlocking {

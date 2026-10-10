@@ -39,9 +39,7 @@ object TestFileContent {
                 |
                 |if __name__ == "__main__":
                 |  main()
-            """
-                .replace("|","")
-                .trimIndent()
+            """.trimMargin()
         }
     }
 }
