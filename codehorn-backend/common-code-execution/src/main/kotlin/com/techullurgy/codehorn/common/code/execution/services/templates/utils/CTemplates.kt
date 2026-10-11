@@ -107,9 +107,9 @@ object CTemplates {
           
           FILE *expectedFile = fopen("/tmp/expected.txt", "w");
           if (expectedFile == NULL) {
-            perror("Error opening result file");
+            perror("Error opening expected.txt file");
           } else {
-            fprintf(expectedFile, "%s", result);
+            fprintf(expectedFile, "%s", value);
             fclose(expectedFile);
           }
         }
@@ -120,16 +120,10 @@ object CTemplates {
           
           FILE *actualFile = fopen("/tmp/actual.txt", "w");
           if (actualFile == NULL) {
-            perror("Error opening result file");
+            perror("Error opening actual.txt file");
           } else {
-            fprintf(actualFile, "%s", result);
+            fprintf(actualFile, "%s", value);
             fclose(actualFile);
-          }
-        }
-        
-        void __toLowercase__(char* str) {
-          for (int i = 0; str[i]; i++) {
-              str[i] = tolower((unsigned char)str[i]);
           }
         }
     """
