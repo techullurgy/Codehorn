@@ -55,7 +55,11 @@ jobs:
 #         - name: Run Python Tests with Console Output
 #           working-directory: codehorn-backend
 #           run: ./gradlew :python-execution-service:test --console=plain --no-daemon
+#
+#         - name: Run Javascript Tests with Console Output
+#           working-directory: codehorn-backend
+#           run: ./gradlew :javascript-execution-service:test --console=plain --no-daemon
 
-        - name: Run Javascript Tests with Console Output
+        - name: Run C Tests with Console Output
           working-directory: codehorn-backend
-          run: ./gradlew :javascript-execution-service:test --console=plain --no-daemon
+          run: ./gradlew :c-execution-service:test --console=plain --no-daemon

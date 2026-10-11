@@ -101,28 +101,30 @@ object CTemplates {
           return value;
         }
         
-        void __writeOutputs__(const char* eResult, const char* result, const char* tNo) {
-            char resultFileName[100];
-            char eResultFileName[100];
+        void __writeExpected__(const char* value) {
+          // char fileName[100];
+          // sprintf(fileName, "/tmp/expected_%s.txt", tNo);
+          
+          FILE *expectedFile = fopen("/tmp/expected.txt", "w");
+          if (expectedFile == NULL) {
+            perror("Error opening result file");
+          } else {
+            fprintf(expectedFile, "%s", result);
+            fclose(expectedFile);
+          }
+        }
         
-            sprintf(resultFileName, "outputs/result%s.txt", tNo);
-            sprintf(eResultFileName, "outputs/eResult%s.txt", tNo);
-        
-            FILE *resultFile = fopen(resultFileName, "w");
-            if (resultFile == NULL) {
-                perror("Error opening result file");
-            } else {
-                fprintf(resultFile, "%s", result);
-                fclose(resultFile);
-            }
-        
-            FILE *eResultFile = fopen(eResultFileName, "w");
-            if (eResultFile == NULL) {
-                perror("Error opening eResult file");
-            } else {
-                fprintf(eResultFile, "%s", eResult);
-                fclose(eResultFile);
-            }
+        void __writeActual__(const char* value) {
+          // char fileName[100];
+          // sprintf(fileName, "/tmp/expected_%s.txt", tNo);
+          
+          FILE *actualFile = fopen("/tmp/actual.txt", "w");
+          if (actualFile == NULL) {
+            perror("Error opening result file");
+          } else {
+            fprintf(actualFile, "%s", result);
+            fclose(actualFile);
+          }
         }
         
         void __toLowercase__(char* str) {
@@ -130,30 +132,24 @@ object CTemplates {
               str[i] = tolower((unsigned char)str[i]);
           }
         }
-    """.trimIndent()
+    """
 
     val MAIN = """
         int main(int argc, char *argv[]) {
-            char* testcaseType = argv[1];
-            char* tNo = argv[2];
+          __readFromFileAndSaveInMap__("/tmp/testcase.txt");
             
-            __toLowercase__(testcaseType);
+          int acceptedCode = atoi(getenv("CODE_ACCEPTED"));
+          int wrongAnswerCode = atoi(getenv("CODE_WRONG_ANSWER"));
+                      
+          // Your code here
             
-            char filePath[100];
-            sprintf(filePath, "/tmp/c/testcases/%s-input%s.txt", testcaseType, tNo);
-            __readFromFileAndSaveInMap__(filePath);
-            
-            // Your code here
-            
-            // Your code ends here
-            
-            __writeOutputs__(eResult, result, tNo);
+          // Your code ends here
         }
-    """.trimIndent()
+    """
 
     val IMPORTS = """
         #include <stdio.h>
         #include <stdlib.h>
         #include <string.h>
-    """.trimIndent()
+    """
 }

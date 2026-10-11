@@ -76,7 +76,6 @@ internal class CppCodeEvaluator(
     }
 
     override fun run(request: EvaluationRequest): Set<RunResult> {
-        // ./runner
         var containerId: ContainerId? = null
 
         val results = mutableSetOf<RunResult>()
