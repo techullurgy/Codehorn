@@ -1,28 +1,18 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCodeHornStore } from '../store/useCodeHornStore';
 import { CodeHornApiService } from '../services/api';
 import ResizablePanel from './ResizablePanel';
 import Editor from '@monaco-editor/react';
-import ReactMarkdown from 'react-markdown';
 import {
   ChevronLeft,
   Play,
   CheckCircle,
-  HelpCircle,
-  ArrowLeftRight,
   RotateCcw,
-  Flame,
-  Calendar,
   Trophy,
-  Bookmark,
   Check,
-  Info,
-  FlameKindling,
-  BookOpen,
-  Clock,
   Terminal,
   AlertTriangle,
   Copy,
@@ -30,9 +20,13 @@ import {
   Plus,
   X
 } from 'lucide-react';
-import { Submission } from '../types';
+import { SimulationState, Submission} from '../types';
+import EditorialContent from './EditorialContent';
+import DescriptionContent from './DescriptionContent';
+import SubmissionsContent from './SubmissionsContent';
+import { SubmissionDetails } from './SubmissionDetails';
 
-const PARAM_LABELS: Record<string, string[]> = {
+export const PARAM_LABELS: Record<string, string[]> = {
   'two-sum': ['nums', 'target'],
   'valid-parentheses': ['s'],
   'longest-substring-without-repeating-characters': ['s'],
@@ -40,88 +34,10 @@ const PARAM_LABELS: Record<string, string[]> = {
   'median-of-two-sorted-arrays': ['nums1', 'nums2']
 };
 
-interface MarkdownCodeBlockProps {
-  lang: string;
-  code: string;
-  theme: string;
-}
-
-function MarkdownCodeBlock({ lang, code, theme }: MarkdownCodeBlockProps) {
-  const [copied, setCopied] = useState(false);
-
-  const handleCopy = () => {
-    navigator.clipboard.writeText(code);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
-  const lines = code.split('\n').length;
-  const calculatedHeight = Math.min(Math.max(lines * 20 + 24, 80), 400);
-  const normalizedLang = lang === 'cpp' ? 'cpp' : lang === 'java' ? 'java' : lang === 'py' || lang === 'python3' || lang === 'python' ? 'python' : lang;
-
-  return (
-    <div className="my-4 rounded-xl border border-zinc-900 bg-zinc-950 overflow-hidden shadow-xl" id="markdown-sc-block">
-      <div className="flex items-center justify-between px-4 py-2 bg-zinc-900/60 border-b border-zinc-900 text-[11px] text-zinc-400 font-mono select-none">
-        <div className="flex items-center space-x-2">
-          <Terminal className="w-3.5 h-3.5 text-amber-500 animate-pulse" />
-          <span className="uppercase tracking-wider font-bold text-zinc-350">{normalizedLang}</span>
-        </div>
-        <button
-          onClick={handleCopy}
-          className="flex items-center space-x-1.5 px-2.5 py-1 rounded bg-zinc-800/60 hover:bg-zinc-800 text-zinc-300 hover:text-white transition-all duration-150 border border-zinc-700/30"
-        >
-          {copied ? (
-            <>
-              <Check className="w-3.5 h-3.5 text-emerald-400" />
-              <span className="text-[10px] text-emerald-400 font-bold">Copied!</span>
-            </>
-          ) : (
-            <>
-              <Copy className="w-3.5 h-3.5" />
-              <span className="text-[10px] font-semibold">Copy Code</span>
-            </>
-          )}
-        </button>
-      </div>
-      <div style={{ height: `${calculatedHeight}px` }} className="relative overflow-hidden w-full select-text">
-        <Editor
-          height="100%"
-          language={normalizedLang}
-          theme={theme}
-          value={code}
-          options={{
-            readOnly: true,
-            minimap: { enabled: false },
-            fontSize: 12,
-            fontFamily: 'JetBrains Mono, ui-monospace, SFMono-Regular, monospace',
-            lineNumbers: 'on',
-            scrollBeyondLastLine: false,
-            folding: true,
-            wordWrap: 'on',
-            domReadOnly: true,
-            automaticLayout: true,
-            scrollbar: {
-              vertical: 'visible',
-              horizontal: 'visible',
-            },
-            padding: { top: 12, bottom: 12 }
-          }}
-          loading={
-            <div className="absolute inset-0 bg-zinc-950 flex flex-col items-center justify-center space-y-2">
-              <div className="w-4 h-4 rounded-full border-2 border-amber-500 border-t-transparent animate-spin" />
-            </div>
-          }
-        />
-      </div>
-    </div>
-  );
-}
-
 export default function ProblemDetail() {
   const router = useRouter();
   const {
     selectedProblem,
-    selectProblem,
     currentLanguage,
     setLanguage,
     codeDrafts,
@@ -136,12 +52,8 @@ export default function ProblemDetail() {
     latestResult,
     activeResultTab,
     activeLeftTab,
-    setLeftTab,
     setResultTab,
     runUserCode,
-    submitUserCode,
-    isDailyChallenge,
-    dailyChallengeDate,
   } = useCodeHornStore();
 
   const [consoleExpanded, setConsoleExpanded] = useState(true);
@@ -151,11 +63,7 @@ export default function ProblemDetail() {
 
   const [localLeftTab, setLocalLeftTab] = useState<string>('description');
   const [openSubTabs, setOpenSubTabs] = useState<Submission[]>([]);
-  const [simulationState, setSimulationState] = useState<Record<string, {
-    step: number;
-    status: 'compiling' | 'samples' | 'hidden' | 'finishing' | 'done';
-    submission: Submission | null;
-  }>>({});
+  const [simulationState, setSimulationState] = useState<Record<string, SimulationState>>({});
 
   const [isMobile, setIsMobile] = useState(false);
   const [mobileTab, setMobileTab] = useState<'problem' | 'code'>('problem');
@@ -286,7 +194,7 @@ export default function ProblemDetail() {
       });
       localStorage.setItem('codehorn_subs_v1', JSON.stringify(updatedSubmissions));
 
-      // Gamification updates 
+      // Gamification updates
       if (realSubmission.status === 'Accepted') {
         const alreadySolved = submissions.some(
           s => s.problemId === selectedProblem.id && s.status === 'Accepted'
@@ -342,331 +250,6 @@ export default function ProblemDetail() {
     }
   };
 
-  const renderSubmissionDetails = (sub: Submission) => {
-    const sim = simulationState[sub.id];
-    const isSimulating = sim && sim.step < 4;
-
-    const sampleTestcases = selectedProblem.testcases.filter(t => t.isSample);
-    const hiddenTestcases = selectedProblem.testcases.filter(t => !t.isSample);
-    const totalSample = sampleTestcases.length;
-    const totalHidden = hiddenTestcases.length;
-
-    // Calculate passed sample & hidden count based on sub status and failedTestCase if failed
-    let passedSample = totalSample;
-    let passedHidden = totalHidden;
-    let totalPassed = selectedProblem.testcases.length;
-
-    if (sub.status !== 'Accepted') {
-      if (sub.failedTestCase) {
-        // Check if failed test case is one of the samples
-        const failedInputClean = sub.failedTestCase.input.replace(/\s+/g, '');
-        const failedIdx = selectedProblem.testcases.findIndex(t => t.input.replace(/\s+/g, '') === failedInputClean);
-
-        if (failedIdx !== -1) {
-          const failedTest = selectedProblem.testcases[failedIdx];
-          if (failedTest.isSample) {
-            // Failed on a sample testcase
-            const idxInSamples = sampleTestcases.findIndex(t => t.id === failedTest.id);
-            passedSample = idxInSamples === -1 ? 0 : idxInSamples;
-            passedHidden = 0;
-            totalPassed = passedSample;
-          } else {
-            // Failed on a hidden testcase
-            passedSample = totalSample; // All samples passed!
-            const idxInHidden = hiddenTestcases.findIndex(t => t.id === failedTest.id);
-            passedHidden = idxInHidden === -1 ? 0 : idxInHidden;
-            totalPassed = passedSample + passedHidden;
-          }
-        } else {
-          // Fallback if failedTestCase does not match any known testcase but we have an error
-          passedSample = Math.min(totalSample, Math.floor(totalSample * 0.6));
-          passedHidden = 0;
-          totalPassed = passedSample;
-        }
-      } else {
-        // Complete failure (eg compile error)
-        passedSample = 0;
-        passedHidden = 0;
-        totalPassed = 0;
-      }
-    }
-
-    if (isSimulating) {
-      // Submitting Simulator Visuals
-      return (
-        <div className="flex-1 overflow-y-auto bg-zinc-950 p-6 flex flex-col space-y-6">
-          <div className="bg-zinc-900/40 border border-zinc-850 rounded-xl p-5 flex flex-col items-center justify-center text-center space-y-4">
-            <div className="relative flex items-center justify-center">
-              {/* Outer double loader rings */}
-              <div className="w-16 h-16 rounded-full border-2 border-zinc-800 border-t-amber-500 animate-spin" />
-              <div className="absolute w-10 h-10 rounded-full border-2 border-dashed border-zinc-700 border-b-emerald-400 animate-spin [animation-direction:reverse]" />
-            </div>
-
-            <div className="space-y-1">
-              <h3 className="text-sm font-bold text-zinc-100 tracking-tight uppercase">Simulating Sandbox Evaluation</h3>
-              <p className="text-xs text-zinc-500 font-mono">ID: {sub.id}</p>
-            </div>
-          </div>
-
-          {/* Detailed visual logging list */}
-          <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 font-mono text-xs space-y-3 shadow-inner">
-            <div className="flex items-center justify-between text-[10px] text-zinc-500 border-b border-zinc-800 pb-2">
-              <span>SANDBOX COMPILER STREAM</span>
-              <span>STATE: ACTIVE</span>
-            </div>
-
-            <div className="space-y-2.5 leading-relaxed">
-              <div className="flex items-start space-x-2">
-                <span className="text-zinc-600">[0.0s]</span>
-                <span className="text-zinc-400 font-medium">Initializing container sandbox environment...</span>
-              </div>
-
-              {sim.step >= 0 && (
-                <div className="flex items-start space-x-2">
-                  <span className="text-zinc-600">[0.3s]</span>
-                  <span className={`${sim.step === 0 ? 'text-amber-400 animate-pulse font-semibold' : 'text-emerald-400'}`}>
-                    {sim.step === 0 ? '⏳ Transpiling source structures...' : '✓ Compilation completed successfully.'}
-                  </span>
-                </div>
-              )}
-
-              {sim.step >= 1 && (
-                <div className="flex items-start space-x-2">
-                  <span className="text-zinc-600">[0.9s]</span>
-                  <span className={`${sim.step === 1 ? 'text-amber-400 animate-pulse font-semibold' : 'text-emerald-400'}`}>
-                    {sim.step === 1 ? `⏳ Running sample validation checks (0/${totalSample})...` : `✓ Passed all ${totalSample} sample test suites.`}
-                  </span>
-                </div>
-              )}
-
-              {sim.step >= 2 && (
-                <div className="flex items-start space-x-2">
-                  <span className="text-zinc-600">[1.7s]</span>
-                  <span className={`${sim.step === 2 ? 'text-amber-400 animate-pulse font-semibold' : 'text-emerald-400'}`}>
-                    {sim.step === 2 ? `⏳ Verifying hidden and edge test suites (0/${totalHidden})...` : '✓ Completed edge scenarios verification.'}
-                  </span>
-                </div>
-              )}
-
-              {sim.step >= 3 && (
-                <div className="flex items-start space-x-2">
-                  <span className="text-zinc-600">[2.5s]</span>
-                  <span className="text-amber-400 animate-pulse font-semibold">⏳ Compiling telemetry metrics & points...</span>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      );
-    }
-
-    // Finished details view
-    const isAccepted = sub.status === 'Accepted';
-    const percentPassed = Math.round((totalPassed / (totalSample + totalHidden)) * 100);
-
-    return (
-      <div className="flex-1 overflow-y-auto px-5 py-6 space-y-6 text-zinc-300 text-sm" id={`sub-details-${sub.id}`}>
-
-        {/* Header summary & Verdict */}
-        <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-5 space-y-4 shadow-sm">
-          <div className="flex items-center justify-between">
-            <span className="text-[10px] uppercase font-mono tracking-wider text-zinc-500 font-bold">Submission Report</span>
-            <span className="text-[11px] font-mono text-zinc-400">{new Date(sub.timestamp).toLocaleTimeString()}</span>
-          </div>
-
-          <div className="flex items-center space-x-4">
-            <div className={`p-3 rounded-xl border ${isAccepted
-                ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400'
-                : 'bg-rose-500/10 border-rose-500/20 text-rose-400'
-              }`}>
-              <CheckCircle className="w-8 h-8" />
-            </div>
-
-            <div className="space-y-1">
-              <div className="flex items-center space-x-2 flex-wrap gap-y-1">
-                <h2 className={`text-xl font-black tracking-tight ${isAccepted ? 'text-emerald-400' : 'text-rose-400'}`}>
-                  {sub.status}
-                </h2>
-                {isAccepted && (
-                  <span className="bg-amber-500/15 text-amber-400 border border-amber-500/25 px-2 py-0.5 rounded-full text-[10px] font-extrabold flex items-center space-x-1 uppercase font-semibold">
-                    <span>👑</span>
-                    <span>Solved (+XP)</span>
-                  </span>
-                )}
-              </div>
-              <p className="text-xs text-zinc-400 font-medium font-sans">
-                {percentPassed}% testcases passed ({totalPassed} / {totalSample + totalHidden})
-              </p>
-            </div>
-          </div>
-
-          {/* Tech Metrics rows */}
-          <div className="grid grid-cols-2 gap-3.5 pt-1">
-            <div className="bg-zinc-950 border border-zinc-850 p-3 rounded-lg">
-              <span className="text-[9px] font-mono text-zinc-500 uppercase tracking-widest block font-bold">Runtime Speed</span>
-              <span className="text-sm font-bold text-zinc-200 mt-1 block font-mono">{sub.runtime} ms</span>
-              <span className="text-[10px] text-zinc-500 block">Beats 82% of users</span>
-            </div>
-            <div className="bg-zinc-950 border border-zinc-850 p-3 rounded-lg">
-              <span className="text-[9px] font-mono text-zinc-500 uppercase tracking-widest block font-bold">Memory Usage</span>
-              <span className="text-sm font-bold text-zinc-200 mt-1 block font-mono">{sub.memory} MB</span>
-              <span className="text-[10px] text-zinc-500 block">Beats 88% of users</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Testcase Progress breakdown */}
-        <div className="space-y-3">
-          <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400 font-sans">Execution Breakdown</h3>
-
-          <div className="space-y-2.5">
-            {/* Sample Case Status bar */}
-            <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-3.5 flex items-center justify-between">
-              <div className="space-y-0.5">
-                <span className="text-xs font-bold text-zinc-200 block">Sample Test cases</span>
-                <span className="text-[10px] text-zinc-500 font-mono">Predefined test suite cases</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <span className={`text-xs font-mono font-bold px-2 py-0.5 rounded-lg ${passedSample === totalSample
-                    ? 'text-emerald-400 bg-emerald-500/10 border border-emerald-500/15'
-                    : 'text-amber-500 bg-amber-500/10 border border-amber-500/15'
-                  }`}>
-                  {passedSample} / {totalSample} Passed
-                </span>
-              </div>
-            </div>
-
-            {/* Hidden Case Status bar */}
-            <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-3.5 flex items-center justify-between">
-              <div className="space-y-0.5">
-                <span className="text-xs font-bold text-zinc-200 block">Hidden Scenario cases</span>
-                <span className="text-[10px] text-zinc-500 font-mono">Secret evaluator and edge scenarios</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <span className={`text-xs font-mono font-bold px-2 py-0.5 rounded-lg ${passedHidden === totalHidden
-                    ? 'text-emerald-400 bg-emerald-500/10 border border-emerald-500/15'
-                    : 'text-rose-500 bg-rose-500/10 border border-rose-500/15'
-                  }`}>
-                  {passedHidden} / {totalHidden} Passed
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Failed TestCase details section */}
-        {!isAccepted && sub.failedTestCase && (() => {
-          const paramNames = PARAM_LABELS[selectedProblem.slug] || ['input'];
-          const parsedInputs = sub.failedTestCase.input.split('\n');
-          return (
-            <div className="bg-rose-950/10 border border-rose-950/20 rounded-xl p-5 space-y-4">
-              <div className="flex items-center space-x-2 border-b border-rose-900/15 pb-2.5">
-                <AlertTriangle className="w-4 h-4 text-rose-450" />
-                <h4 className="text-xs font-bold text-rose-300 uppercase tracking-wide">Failed testcase metrics</h4>
-              </div>
-
-              <div className="space-y-4 text-xs font-mono">
-                {/* Inputs breakdown block */}
-                <div className="space-y-3.5">
-                  {paramNames.map((name, paramIdx) => {
-                    const val = parsedInputs[paramIdx] !== undefined ? parsedInputs[paramIdx] : '';
-                    return (
-                      <div key={name} className="flex flex-col space-y-1">
-                        <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest font-extrabold">
-                          Input#{paramIdx + 1} ({name})
-                        </span>
-                        <div className="bg-zinc-950 border border-zinc-900 rounded-lg p-2.5 text-zinc-300 font-mono overflow-x-auto select-all max-h-32">
-                          {val}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-
-                {/* Outputs expected / actual grid layout */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
-                  <div className="space-y-1">
-                    <span className="text-[10px] font-mono text-emerald-500 block uppercase tracking-wider font-extrabold">Expected Output:</span>
-                    <div className="bg-emerald-950/15 border border-emerald-950/25 rounded-lg p-2.5 text-emerald-350 overflow-x-auto select-all font-mono">
-                      {sub.failedTestCase.expected}
-                    </div>
-                  </div>
-                  <div className="space-y-1">
-                    <span className="text-[10px] font-mono text-rose-550 block uppercase tracking-wider font-extrabold">Actual Output:</span>
-                    <div className="bg-rose-950/15 border border-rose-950/25 rounded-lg p-2.5 text-rose-350 overflow-x-auto select-all font-mono font-bold">
-                      {sub.failedTestCase.actual}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Stdout Console Logs if any exists */}
-                <div className="space-y-1 bg-zinc-950/40 rounded-lg p-3.5 border border-zinc-900">
-                  <span className="text-[10px] font-mono text-zinc-550 block uppercase tracking-wider font-extrabold">Stdout (Console Logs)</span>
-                  {sub.failedTestCase.stdout ? (
-                    <pre className="text-zinc-400 whitespace-pre-wrap overflow-x-auto select-text font-mono leading-relaxed mt-1.5 text-[11px] bg-zinc-950 p-2.5 rounded max-h-40 border border-zinc-900/60 shadow-inner">
-                      {sub.failedTestCase.stdout}
-                    </pre>
-                  ) : (
-                    <span className="text-zinc-600 text-[10px] block font-mono italic mt-1 font-medium">No standard output logged.</span>
-                  )}
-                </div>
-
-              </div>
-            </div>
-          );
-        })()}
-
-        {/* Submitted Code snippet with Copy action */}
-        <div className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden shadow-sm">
-          <div className="flex items-center justify-between px-3.5 py-2.5 border-b border-zinc-800/80 bg-zinc-900/35">
-            <span className="text-[10px] font-mono text-zinc-500 font-bold uppercase tracking-wide">Submitted Source ({sub.language})</span>
-            <button
-              onClick={() => {
-                navigator.clipboard.writeText(sub.code);
-                alert('Code copied to clipboard.');
-              }}
-              className="px-2 py-1 text-[10px] text-zinc-400 hover:text-zinc-200 bg-zinc-950 hover:bg-zinc-850 rounded border border-zinc-800 transition-all flex items-center space-x-1 font-semibold"
-            >
-              <Copy className="w-3 h-3" />
-              <span>Copy Code</span>
-            </button>
-          </div>
-          <div className="h-[250px] border-t border-zinc-900 overflow-hidden relative">
-            <Editor
-              height="100%"
-              language={sub.language === 'cpp' ? 'cpp' : sub.language === 'java' ? 'java' : sub.language}
-              theme={editorTheme}
-              value={sub.code}
-              options={{
-                readOnly: true,
-                minimap: { enabled: false },
-                fontSize: 12,
-                fontFamily: 'JetBrains Mono, ui-monospace, SFMono-Regular, monospace',
-                lineNumbers: 'on',
-                scrollBeyondLastLine: false,
-                folding: true,
-                wordWrap: 'on',
-                domReadOnly: true,
-                automaticLayout: true,
-                scrollbar: {
-                  vertical: 'visible',
-                  horizontal: 'visible',
-                }
-              }}
-              loading={
-                <div className="absolute inset-0 bg-zinc-950 flex flex-col items-center justify-center space-y-2">
-                  <div className="w-5 h-5 rounded-full border-2 border-amber-500 border-t-transparent animate-spin" />
-                  <span className="text-[10px] text-zinc-550 font-mono">Loading highlighted source...</span>
-                </div>
-              }
-            />
-          </div>
-        </div>
-
-      </div>
-    );
-  };
-
   // Get difficulty badge color rules
   const getDiffColor = (diff: string) => {
     switch (diff) {
@@ -694,255 +277,31 @@ export default function ProblemDetail() {
       const subId = localLeftTab.replace('submission-', '');
       const sub = openSubTabs.find(t => t.id === subId);
       if (sub) {
-        return renderSubmissionDetails(sub);
+        return <SubmissionDetails sub={sub} simulationState={simulationState} selectedProblem={selectedProblem}/>;
       }
     }
 
     switch (localLeftTab) {
       case 'editorial':
         return (
-          <div className="flex-1 overflow-y-auto px-5 py-6 space-y-6 text-zinc-300 text-sm leading-relaxed" id="detail-left-editorial">
-            <div className="flex items-center space-x-2 pb-2 border-b border-zinc-800">
-              <BookOpen className="w-5 h-5 text-amber-500" />
-              <h2 className="text-lg font-bold text-zinc-100">Official Editorial & Solution</h2>
-            </div>
-
-            <div className="prose prose-invert max-w-none text-zinc-300 space-y-4">
-              <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4">
-                <h4 className="text-sm font-bold text-amber-400 uppercase tracking-wider mb-2">Complexity Frameworks</h4>
-                <ul className="list-disc pl-5 space-y-2 text-xs">
-                  <li><strong>Active Approaches:</strong> {selectedProblem.solutionApproaches ? selectedProblem.solutionApproaches.join(', ') : 'Optimal Hash lookup'}</li>
-                  <li><strong>Avg Compiles Required:</strong> ~3 executions before green marks</li>
-                </ul>
-              </div>
-
-              {/* Editorial text formatted section */}
-              <div className="leading-relaxed text-zinc-300 antialiased font-sans">
-                <ReactMarkdown
-                  components={{
-                    p: ({ children }) => <p className="mb-4 text-zinc-300 leading-relaxed font-sans">{children}</p>,
-                    h1: ({ children }) => <h1 className="text-xl font-extrabold text-zinc-100 tracking-tight mt-6 mb-3">{children}</h1>,
-                    h2: ({ children }) => <h2 className="text-lg font-extrabold text-zinc-100 tracking-tight mt-5 mb-2.5">{children}</h2>,
-                    h3: ({ children }) => <h3 className="text-md font-bold text-zinc-200 tracking-tight mt-4 mb-2">{children}</h3>,
-                    strong: ({ children }) => <strong className="font-extrabold text-zinc-100">{children}</strong>,
-                    em: ({ children }) => <em className="italic text-zinc-200">{children}</em>,
-                    code: ({ node, className, children, ...props }) => {
-                      const match = /language-(\w+)/.exec(className || '');
-                      const rawCode = String(children).replace(/\n$/, '');
-                      if (match) {
-                        return (
-                          <MarkdownCodeBlock
-                            lang={match[1]}
-                            code={rawCode}
-                            theme={editorTheme}
-                          />
-                        );
-                      }
-                      return (
-                        <code className="bg-zinc-900 border border-zinc-800/60 text-amber-400 px-1.5 py-0.5 rounded text-[12px] font-mono leading-none font-medium mx-0.5" {...props}>
-                          {children}
-                        </code>
-                      );
-                    },
-                    ol: ({ children }) => <ol className="list-decimal pl-5 mb-4 space-y-1.5 text-zinc-300">{children}</ol>,
-                    ul: ({ children }) => <ul className="list-disc pl-5 mb-4 space-y-1.5 text-zinc-300">{children}</ul>,
-                    li: ({ children }) => <li className="leading-relaxed mb-1">{children}</li>,
-                    pre: ({ children }) => <>{children}</>,
-                  }}
-                >
-                  {selectedProblem.editorial}
-                </ReactMarkdown>
-              </div>
-            </div>
-          </div>
+          <EditorialContent />
         );
 
       case 'submissions':
         const problemSubmissions = submissions.filter((s) => s.problemId === selectedProblem.id);
         return (
-          <div className="flex-1 overflow-y-auto px-5 py-6 space-y-6 text-zinc-300 text-sm" id="detail-left-submissions">
-            <div className="flex items-center justify-between pb-2 border-b border-zinc-800">
-              <div className="flex items-center space-x-2">
-                <Clock className="w-5 h-5 text-amber-500" />
-                <h2 className="text-lg font-bold text-zinc-100">Submission History logs</h2>
-              </div>
-              <span className="text-xs text-zinc-500 font-mono">Total checks: {problemSubmissions.length}</span>
-            </div>
-
-            {problemSubmissions.length > 0 ? (
-              <div className="space-y-3">
-                {problemSubmissions.map((sub) => (
-                  <div
-                    key={sub.id}
-                    onClick={() => {
-                      if (!openSubTabs.some(t => t.id === sub.id)) {
-                        setOpenSubTabs(prev => [...prev, sub]);
-                      }
-                      setLocalLeftTab(`submission-${sub.id}`);
-                    }}
-                    className="p-4 rounded-xl border border-zinc-800 bg-zinc-900/30 hover:bg-zinc-900/60 cursor-pointer transition-all duration-150 flex items-center justify-between group"
-                    id={`sub-history-item-${sub.id}`}
-                  >
-                    <div className="space-y-1.5">
-                      <div className="flex items-center space-x-2.5">
-                        <span className={`font-bold text-sm ${sub.status === 'Accepted' ? 'text-emerald-400' : 'text-rose-400'
-                          }`}>
-                          {sub.status}
-                        </span>
-                        <span className="text-xs text-zinc-500">•</span>
-                        <span className="text-xs text-zinc-400 font-mono capitalize">{sub.language}</span>
-                      </div>
-                      <div className="text-xs text-zinc-500 font-mono">
-                        {new Date(sub.timestamp).toLocaleString(undefined, { dateStyle: 'short', timeStyle: 'short' })}
-                      </div>
-                    </div>
-
-                    <div className="flex items-center space-x-4">
-                      <div className="text-right text-xs font-mono space-y-0.5">
-                        <div className="text-zinc-300">{sub.runtime} ms</div>
-                        <div className="text-zinc-500">{sub.memory} MB</div>
-                      </div>
-                      <div className="text-zinc-500 group-hover:text-amber-500 text-xs font-semibold">
-                        View Code
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="py-12 text-center text-zinc-500 font-medium">
-                <HelpCircle className="w-10 h-10 mx-auto text-zinc-700 mb-2 animate-pulse" />
-                <p>No submissions found for this problem.</p>
-                <p className="text-xs text-zinc-600 mt-1">Submit your code inside the editor sandbox to see records here.</p>
-              </div>
-            )}
-          </div>
+          <SubmissionsContent 
+            problemSubmissions={problemSubmissions} 
+            openSubTabs={openSubTabs} 
+            setLocalLeftTab={setLocalLeftTab} 
+            setOpenSubTabs={setOpenSubTabs}
+          />
         );
 
       case 'description':
       default:
         return (
-          <div className="flex-1 overflow-y-auto px-5 py-6 space-y-6" id="detail-left-description">
-            {/* Title & Stats */}
-            <div className="space-y-3">
-              {isDailyChallenge && dailyChallengeDate && (
-                <div className="flex items-center space-x-2 bg-amber-500/10 border border-amber-500/25 rounded-md px-3 py-1.5 text-amber-400 max-w-max select-none animate-fade-in">
-                  <Trophy className="w-4 h-4 text-amber-500 animate-pulse shrink-0" />
-                  <span className="text-[10px] font-black tracking-wider uppercase font-sans">
-                    OFFICIAL DAILY CHALLENGE • {new Date(dailyChallengeDate).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
-                  </span>
-                </div>
-              )}
-              <div className="flex flex-wrap items-center gap-2.5">
-                <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold border ${getDiffColor(selectedProblem.difficulty)}`}>
-                  {selectedProblem.difficulty}
-                </span>
-                <span className="text-zinc-500 text-xs">•</span>
-                <span className="text-zinc-400 text-xs font-medium bg-zinc-900 border border-zinc-800 px-2.5 py-0.5 rounded-md">
-                  {selectedProblem.category}
-                </span>
-                <span className="text-zinc-500 text-xs">•</span>
-                <span className="text-zinc-400 text-xs font-mono">Acceptance: {selectedProblem.acceptanceRate}%</span>
-              </div>
-              <h1 className="text-xl lg:text-2xl font-extrabold text-zinc-100 tracking-tight">
-                {selectedProblem.id}. {selectedProblem.title}
-              </h1>
-            </div>
-
-            {/* Problem markdown representation */}
-            <div className="leading-relaxed text-zinc-300 antialiased font-sans">
-              <ReactMarkdown
-                components={{
-                  p: ({ children }) => <p className="mb-4 text-zinc-300 leading-relaxed font-sans">{children}</p>,
-                  h1: ({ children }) => <h1 className="text-xl font-extrabold text-zinc-100 tracking-tight mt-6 mb-3">{children}</h1>,
-                  h2: ({ children }) => <h2 className="text-lg font-extrabold text-zinc-100 tracking-tight mt-5 mb-2.5">{children}</h2>,
-                  h3: ({ children }) => <h3 className="text-md font-bold text-zinc-200 tracking-tight mt-4 mb-2">{children}</h3>,
-                  strong: ({ children }) => <strong className="font-extrabold text-zinc-100">{children}</strong>,
-                  em: ({ children }) => <em className="italic text-zinc-200">{children}</em>,
-                  code: ({ node, className, children, ...props }) => {
-                    const match = /language-(\w+)/.exec(className || '');
-                    const rawCode = String(children).replace(/\n$/, '');
-                    if (match) {
-                      return (
-                        <MarkdownCodeBlock
-                          lang={match[1]}
-                          code={rawCode}
-                          theme={editorTheme}
-                        />
-                      );
-                    }
-                    return (
-                      <code className="bg-zinc-900 border border-zinc-800/60 text-amber-400 px-1.5 py-0.5 rounded text-[12px] font-mono leading-none font-medium mx-0.5" {...props}>
-                        {children}
-                      </code>
-                    );
-                  },
-                  ol: ({ children }) => <ol className="list-decimal pl-5 mb-4 space-y-1.5 text-zinc-300">{children}</ol>,
-                  ul: ({ children }) => <ul className="list-disc pl-5 mb-4 space-y-1.5 text-zinc-300">{children}</ul>,
-                  li: ({ children }) => <li className="leading-relaxed mb-1">{children}</li>,
-                  pre: ({ children }) => <>{children}</>,
-                }}
-              >
-                {selectedProblem.description}
-              </ReactMarkdown>
-            </div>
-
-            {/* Examples visual layout */}
-            <div className="space-y-4">
-              <h3 className="text-sm font-bold text-zinc-200">Examples:</h3>
-              {selectedProblem.examples.map((ex) => (
-                <div key={ex.id} className="bg-zinc-900/60 border border-zinc-800/80 rounded-xl p-4 space-y-2 text-xs font-mono">
-                  <div className="text-xs font-semibold text-zinc-400">Example {ex.id}:</div>
-                  <div className="space-y-1">
-                    <div>
-                      <span className="text-amber-500/80 font-bold">Input:</span>{' '}
-                      <span className="text-zinc-300 select-all">{ex.input}</span>
-                    </div>
-                    <div>
-                      <span className="text-emerald-500/85 font-bold">Output:</span>{' '}
-                      <span className="text-zinc-300 select-all">{ex.output}</span>
-                    </div>
-                    {ex.explanation && (
-                      <div className="text-zinc-400 pt-1.5 border-t border-zinc-800/60 leading-relaxed">
-                        <span className="text-zinc-500 italic">Explanation:</span> {ex.explanation}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Constraints Block */}
-            <div className="space-y-2.5 pt-4 border-t border-zinc-800/60">
-              <h3 className="text-sm font-bold text-zinc-200">Constraints:</h3>
-              <ul className="space-y-1.5 list-disc pl-5 text-xs text-zinc-400 font-mono">
-                {selectedProblem.constraints.map((c, idx) => (
-                  <li key={idx}>
-                    <span>{c}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Hints lists togglers list */}
-            <div className="space-y-3 pt-4 border-t border-zinc-800/60">
-              <h3 className="text-sm font-bold text-zinc-200">Hints:</h3>
-              {selectedProblem.hints.map((hint, index) => (
-                <details
-                  key={index}
-                  className="group bg-zinc-900/30 border border-zinc-800/60 rounded-lg overflow-hidden transition-all duration-150"
-                >
-                  <summary className="flex justify-between items-center px-4 py-2.5 text-xs font-semibold text-amber-500/90 cursor-pointer select-none hover:bg-zinc-900/40">
-                    <span>Hint #{index + 1}</span>
-                    <span className="text-zinc-500 group-open:scale-y-[-1] transition-transform duration-100">▼</span>
-                  </summary>
-                  <p className="px-4 pb-3.5 text-xs text-zinc-400 leading-relaxed border-t border-zinc-800/40 pt-2.5 font-sans">
-                    {hint}
-                  </p>
-                </details>
-              ))}
-            </div>
-          </div>
+          <DescriptionContent />
         );
     }
   };
@@ -966,7 +325,7 @@ export default function ProblemDetail() {
         </div>
       )}
 
-      {/* Tabs list (Description, Editorial, Submission history, dynamic submission details) */}
+      
       <div className="flex border-b border-zinc-850 shrink-0 bg-zinc-950/45 text-xs font-medium px-4 select-none overflow-x-auto scrollbar-none gap-0.5">
         <button
           id="tab-desc-btn"
@@ -1044,7 +403,6 @@ export default function ProblemDetail() {
         })}
       </div>
 
-      {/* Dynamic Body content rendering block */}
       {renderLeftPanelContent()}
     </div>
   );
@@ -1478,7 +836,7 @@ export default function ProblemDetail() {
                       <div className="p-4 space-y-4 font-sans">
                         {/* Header metadata layout */}
                         <div className="flex justify-between items-center text-xs">
-                          <span className="text-zinc-500 font-bold uppercase text-[9px] tracking-wider">Dynamic Testcase Editor ({parsedCases.length}/8)</span>
+                          <span className="text-zinc-500 font-bold uppercase text-[9px] tracking-wider">Testcases ({parsedCases.length}/8)</span>
                           <span className="text-zinc-650 text-[10px] italic">Edit specific variables dynamically</span>
                         </div>
 

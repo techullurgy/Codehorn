@@ -73,3 +73,9 @@ export interface ExecutionResult {
     stdout?: string;
   };
 }
+
+export interface SimulationState {
+  step: number;
+  status: 'compiling' | 'samples' | 'hidden' | 'finishing' | 'done';
+  submission: Submission | null;
+}

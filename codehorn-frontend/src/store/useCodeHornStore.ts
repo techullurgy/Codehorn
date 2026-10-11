@@ -56,7 +56,7 @@ interface CodeHornState {
   setCustomTestcase: (text: string) => void;
   setEditorTheme: (theme: 'vs-dark' | 'hc-black' | 'light') => void;
   setGlobalTheme: (theme: 'dark' | 'light') => void;
-  
+
   // Filtering Actions
   setFilterDifficulty: (difficulty: 'All' | Difficulty) => void;
   setFilterStatus: (status: 'All' | ProblemStatus) => void;
@@ -70,7 +70,7 @@ interface CodeHornState {
   clearResult: () => void;
   setLeftTab: (tab: 'description' | 'editorial' | 'submissions') => void;
   setResultTab: (tab: 'testcase' | 'result') => void;
-  
+
   // Helper Actions
   getProblemStatus: (problemId: string) => ProblemStatus;
   getSolvedCount: () => { easy: number; medium: number; hard: number; total: number };
@@ -142,7 +142,7 @@ export const useCodeHornStore = create<CodeHornState>((set, get) => ({
       // Load or set starter code as initial draft if none exists
       const drafts = get().codeDrafts;
       const lang = get().currentLanguage;
-      
+
       const updatedDrafts = { ...drafts };
       if (!updatedDrafts[problem.id]) {
         updatedDrafts[problem.id] = { ...problem.starterCode };
@@ -230,19 +230,19 @@ export const useCodeHornStore = create<CodeHornState>((set, get) => ({
     localStorage.setItem('codehorn_global_theme', theme);
   },
 
-  setFilterDifficulty: (difficulty) => 
+  setFilterDifficulty: (difficulty) =>
     set((state) => ({ filters: { ...state.filters, difficulty } })),
 
-  setFilterStatus: (status) => 
+  setFilterStatus: (status) =>
     set((state) => ({ filters: { ...state.filters, status } })),
 
-  setFilterSearch: (search) => 
+  setFilterSearch: (search) =>
     set((state) => ({ filters: { ...state.filters, search } })),
 
-  setFilterCategory: (category) => 
+  setFilterCategory: (category) =>
     set((state) => ({ filters: { ...state.filters, category } })),
 
-  resetFilters: () => 
+  resetFilters: () =>
     set((state) => ({
       filters: {
         difficulty: 'All',
@@ -259,7 +259,7 @@ export const useCodeHornStore = create<CodeHornState>((set, get) => ({
     set({ isRunning: true, activeResultTab: 'result' });
 
     const code = codeDrafts[selectedProblem.id]?.[currentLanguage] || '';
-    
+
     const result = await CodeHornApiService.runCode(
       selectedProblem.slug,
       currentLanguage,
@@ -309,7 +309,7 @@ export const useCodeHornStore = create<CodeHornState>((set, get) => ({
         const pointsAwarded = selectedProblem.difficulty === 'Easy' ? 10 : selectedProblem.difficulty === 'Medium' ? 20 : 30;
         const newXP = get().xpPoints + pointsAwarded;
         localStorage.setItem('codehorn_xp', String(newXP));
-        
+
         // Randomly bump streak for realism
         const newStreak = get().streak + 1;
         localStorage.setItem('codehorn_streak', String(newStreak));
