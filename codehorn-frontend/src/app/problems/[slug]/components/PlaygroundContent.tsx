@@ -1,3 +1,5 @@
+"use client";
+
 import { CodeEditor } from "@/src/app/components/CodeEditor";
 import ResizablePanel from "@/src/app/components/ResizablePanel";
 import { useEditorStore } from "@/src/store/hooks/use-editor-store";
@@ -62,9 +64,9 @@ const PlaygroundSettings = () => {
           className="bg-zinc-900 border border-zinc-800 rounded-lg py-1 px-2 text-xs font-semibold text-zinc-400 focus:outline-none cursor-pointer hover:border-zinc-700 transition"
           title="Monaco Editor Theme"
         >
-          <option value="vs-dark">Editor Theme: Dark</option>
-          <option value="hc-black">Editor Theme: Contrast</option>
-          <option value="light">Editor Theme: Light</option>
+          <option value="vs-dark">Dark</option>
+          <option value="hc-black">Contrast</option>
+          <option value="light">Light</option>
         </select>
 
         <div className="h-4 w-px bg-zinc-805" />
@@ -182,5 +184,5 @@ const PlaygroundEditorWithConsole = () => {
 };
 
 const BottomElement = () => {
-  return <></>;
+  return <p>Bottom Element</p>;
 };

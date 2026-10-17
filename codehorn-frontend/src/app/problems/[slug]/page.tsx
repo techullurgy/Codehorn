@@ -8,6 +8,8 @@ import SubmissionsContent from "./components/SubmissionsContent";
 import EditorialContent from "./components/EditorialContent";
 import DescriptionContent from "./components/DescriptionContent";
 import AppLayout from "@/src/components/AppLayout";
+import PlaygroundContent from "./components/PlaygroundContent";
+import ResizablePanel from "../../components/ResizablePanel";
 
 type ProblemPlaygroundPageProps = {
   params: Promise<{ slug: string }>;
@@ -30,21 +32,37 @@ export default async ({ params }: ProblemPlaygroundPageProps) => {
     throw Error("No problem found");
   }
 
+  const LeftPanelElement = (
+    <LeftPanel
+      descriptionElement={
+        <DescriptionContent isDailyChallenge={false} problem={problem} />
+      }
+      editorialElement={<EditorialContent editorial={"Editorial"} />}
+      submissionsElement={<SubmissionsContent />}
+    />
+  );
+
+  const RightPanelElement = <PlaygroundContent />;
+
   return (
     <>
       <AppLayout>
         <HydrationBoundary state={dehydrate(queryClient)}>
           <ProblemPlaygroundContextProvider slug={slug}>
-            <LeftPanel
-              descriptionElement={
-                <DescriptionContent
-                  isDailyChallenge={false}
-                  problem={problem}
-                />
-              }
-              editorialElement={<EditorialContent editorial={"Editorial"} />}
-              submissionsElement={<SubmissionsContent />}
-            />
+            <div
+              className="flex-1 min-h-0 bg-zinc-950 overflow-hidden"
+              id="workspace-splits-panel"
+            >
+              <ResizablePanel
+                direction="horizontal"
+                initialSplit={40}
+                minSize={25}
+                maxSize={75}
+                idPrefix="workspace-split"
+                left={LeftPanelElement}
+                right={RightPanelElement}
+              />
+            </div>
           </ProblemPlaygroundContextProvider>
         </HydrationBoundary>
       </AppLayout>
