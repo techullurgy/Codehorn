@@ -1,25 +1,53 @@
-import { fetchProblemBySlugServer } from '../../api/problems-helper';
-import AppLayout from '../../../components/AppLayout';
-import ProblemDetailWrapper from '../../../components/ProblemDetailWrapper';
-import { notFound } from 'next/navigation';
+import { getProblemBySlug } from "@/src/actions/get-problem-by-slug";
+import { ProblemPlaygroundContextProvider } from "@/src/contexts/problem-playground-context";
+import { getQueryClient } from "@/src/libs/get-query-client";
+import { Problem } from "@/src/types/Problem";
+import { dehydrate, HydrationBoundary, noop } from "@tanstack/react-query";
+import LeftPanel from "./components/LeftPanel";
+import SubmissionsContent from "./components/SubmissionsContent";
+import EditorialContent from "./components/EditorialContent";
+import DescriptionContent from "./components/DescriptionContent";
+import AppLayout from "@/src/components/AppLayout";
 
-export const dynamic = 'force-dynamic';
-
-export default async function ProblemPage({
-  params,
-}: {
+type ProblemPlaygroundPageProps = {
   params: Promise<{ slug: string }>;
-}) {
-  const { slug } = await params;
-  const problem = await fetchProblemBySlugServer(slug);
+};
+
+// ProblemPlaygrondPage
+export default async ({ params }: ProblemPlaygroundPageProps) => {
+  const slug = (await params).slug;
+
+  const queryClient = getQueryClient();
+
+  const problem = await queryClient
+    .fetchQuery<Problem>({
+      queryKey: ["problem", slug],
+      queryFn: () => getProblemBySlug(slug),
+    })
+    .catch(noop);
 
   if (!problem) {
-    notFound();
+    throw Error("No problem found");
   }
 
   return (
-    <AppLayout>
-      <ProblemDetailWrapper problem={problem} />
-    </AppLayout>
+    <>
+      <AppLayout>
+        <HydrationBoundary state={dehydrate(queryClient)}>
+          <ProblemPlaygroundContextProvider slug={slug}>
+            <LeftPanel
+              descriptionElement={
+                <DescriptionContent
+                  isDailyChallenge={false}
+                  problem={problem}
+                />
+              }
+              editorialElement={<EditorialContent editorial={"Editorial"} />}
+              submissionsElement={<SubmissionsContent />}
+            />
+          </ProblemPlaygroundContextProvider>
+        </HydrationBoundary>
+      </AppLayout>
+    </>
   );
-}
+};
