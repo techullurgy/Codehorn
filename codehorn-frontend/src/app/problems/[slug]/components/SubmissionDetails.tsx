@@ -1,20 +1,41 @@
 "use client";
 
 import { StaticCodeViewer } from "@/src/app/components/StaticCodeViewer";
+import { useProblemPlaygroundStore } from "@/src/store/hooks/use-problem-playground-store";
 import { Submission } from "@/src/types/Submission";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useIsMutating, useQuery } from "@tanstack/react-query";
 import { AlertTriangle, CheckCircle, Copy } from "lucide-react";
 
 type SubmissionDetailsProps = {
   submissionId: string;
 };
 
-// SubmissionDetails
+// SubmissionDetails2
 export default ({ submissionId }: SubmissionDetailsProps) => {
-  const { data: submission } = useSuspenseQuery<Submission>({
-    queryKey: ["problem", "submission", submissionId],
+  const slug = useProblemPlaygroundStore((state) => state.slug);
+
+  const isFromMutation = submissionId.includes("submission-mutation");
+
+  const isMutationPending =
+    useIsMutating({
+      mutationKey: ["problem", slug, "submit-code"],
+      exact: true,
+    }) > 0;
+
+  const { data: submission, isLoading } = useQuery<Submission>({
+    queryKey: ["problem", slug, "submission", submissionId],
     queryFn: async () => null,
+    enabled: !isFromMutation,
+    staleTime: Infinity,
   });
+
+  if (isFromMutation && isMutationPending) {
+    return <>Mutation Pending</>;
+  }
+
+  if (isLoading) {
+    return <>Loading Submission</>;
+  }
 
   const isAccepted = submission.verdict === "Accepted";
 
@@ -180,7 +201,7 @@ export default ({ submissionId }: SubmissionDetailsProps) => {
                 {/* Stdout Console Logs if any exists */}
                 <div className="space-y-1 bg-zinc-950/40 rounded-lg p-3.5 border border-zinc-900">
                   <span className="text-[10px] font-mono text-zinc-550 block uppercase tracking-wider font-extrabold">
-                    Stdout (Console Logs)
+                    Stdout
                   </span>
                   {submission.failedTestcaseResult.stdout ? (
                     <pre className="text-zinc-400 whitespace-pre-wrap overflow-x-auto select-text font-mono leading-relaxed mt-1.5 text-[11px] bg-zinc-950 p-2.5 rounded max-h-40 border border-zinc-900/60 shadow-inner">

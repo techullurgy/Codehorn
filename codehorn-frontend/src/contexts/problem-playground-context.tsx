@@ -6,6 +6,7 @@ import {
   ProblemPlaygroundStore,
 } from "../store/problem-playground-store";
 import { StoreApi } from "zustand";
+import { ProblemTestCase } from "../types/Problem";
 
 export const ProblemPlaygroundContext = createContext<
   StoreApi<ProblemPlaygroundStore> | undefined
@@ -13,14 +14,20 @@ export const ProblemPlaygroundContext = createContext<
 
 type ProblemPlaygroundContextProviderProps = {
   slug: string;
+  testcases: ProblemTestCase[];
 } & PropsWithChildren;
 
 export const ProblemPlaygroundContextProvider = ({
   children,
   slug,
+  testcases,
 }: ProblemPlaygroundContextProviderProps) => {
   const [store] = useState<StoreApi<ProblemPlaygroundStore>>(() =>
-    createProblemPlaygroundStore({ slug }),
+    createProblemPlaygroundStore({
+      slug,
+      testcases,
+      originalTestcasesCount: testcases.length,
+    }),
   );
 
   return (

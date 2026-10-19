@@ -17,7 +17,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
   return (
     <QueryClientProvider client={queryClient.current}>
       <div
-        className={`${"min-h-screen"} w-screen flex flex-col font-sans ${"overflow-y-auto custom-minimal-scrollbar"} ${
+        className={`h-screen w-screen flex flex-col font-sans ${"overflow-hidden custom-minimal-scrollbar"} ${
           globalTheme === "light" ? "global-theme-light" : ""
         } bg-zinc-950 text-zinc-100`}
       >

@@ -13,7 +13,7 @@ export default () => {
   );
 
   const { data: submissions } = useSuspenseQuery<Submission[]>({
-    queryKey: ["problem", "submission", problemSlug],
+    queryKey: ["problem", problemSlug, "submissions"],
     queryFn: async () => [],
   });
 

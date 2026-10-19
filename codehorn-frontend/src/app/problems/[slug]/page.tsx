@@ -48,7 +48,10 @@ export default async ({ params }: ProblemPlaygroundPageProps) => {
     <>
       <AppLayout>
         <HydrationBoundary state={dehydrate(queryClient)}>
-          <ProblemPlaygroundContextProvider slug={slug}>
+          <ProblemPlaygroundContextProvider
+            slug={slug}
+            testcases={problem.testcases}
+          >
             <div
               className="flex-1 min-h-0 bg-zinc-950 overflow-hidden"
               id="workspace-splits-panel"

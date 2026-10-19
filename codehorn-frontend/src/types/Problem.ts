@@ -9,7 +9,8 @@ export interface Problem {
   examples: ProblemExample[]
   constraints: string[]
   hints: string[],
-  status: ProblemStatus
+  status: ProblemStatus,
+  testcases: ProblemTestCase[]
 }
 
 export type ProblemDifficulty = 'Easy' | 'Medium' | 'Hard'

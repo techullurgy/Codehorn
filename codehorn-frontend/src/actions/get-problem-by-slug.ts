@@ -31,6 +31,33 @@ export const getProblemBySlug: (slug: string) => Promise<Problem> = async (slug:
     hints: [
       'Add two numbers'
     ],
-    status: 'Solved'
+    status: 'Solved',
+    testcases: [
+      {
+        id: "1",
+        inputs: {
+          a: "12",
+          b: "29"
+        },
+        expectedOutput: "41"
+      },
+      {
+        id: "2",
+        inputs: {
+          a: "-12",
+          b: "293"
+        },
+        expectedOutput: "281"
+      },
+
+      {
+        id: "3",
+        inputs: {
+          a: "-927",
+          b: "-26"
+        },
+        expectedOutput: "-953"
+      }
+    ]
   }
 }
