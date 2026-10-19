@@ -1,5 +1,6 @@
 "use client";
 
+import { getSubmissionById } from "@/src/actions/get-submission-by-id";
 import { StaticCodeViewer } from "@/src/app/components/StaticCodeViewer";
 import { useProblemPlaygroundStore } from "@/src/store/hooks/use-problem-playground-store";
 import { Submission } from "@/src/types/Submission";
@@ -22,9 +23,9 @@ export default ({ submissionId }: SubmissionDetailsProps) => {
       exact: true,
     }) > 0;
 
-  const { data: submission, isLoading } = useQuery<Submission>({
+  const { data: submission, isPending } = useQuery<Submission>({
     queryKey: ["problem", slug, "submission", submissionId],
-    queryFn: async () => null,
+    queryFn: async () => getSubmissionById(submissionId),
     enabled: !isFromMutation,
     staleTime: Infinity,
   });
@@ -33,7 +34,7 @@ export default ({ submissionId }: SubmissionDetailsProps) => {
     return <>Mutation Pending</>;
   }
 
-  if (isLoading) {
+  if (isPending) {
     return <>Loading Submission</>;
   }
 
@@ -167,14 +168,14 @@ export default ({ submissionId }: SubmissionDetailsProps) => {
                 {/* Inputs breakdown block */}
                 <div className="space-y-3.5">
                   {Object.entries(parsedInputs).map(([key, value]) => (
-                    <>
+                    <div key={key}>
                       <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest font-extrabold">
                         {key}
                       </span>
                       <div className="bg-zinc-950 border border-zinc-900 rounded-lg p-2.5 text-zinc-300 font-mono overflow-x-auto select-all max-h-32">
                         {value}
                       </div>
-                    </>
+                    </div>
                   ))}
                 </div>
 

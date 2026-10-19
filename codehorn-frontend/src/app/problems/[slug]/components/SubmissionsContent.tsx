@@ -1,8 +1,9 @@
 "use client";
 
+import { getSubmissionsForProblem } from "@/src/actions/get-submissions-for-problem";
 import { useProblemPlaygroundStore } from "@/src/store/hooks/use-problem-playground-store";
 import { Submission } from "@/src/types/Submission";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { HelpCircle } from "lucide-react";
 
 // SubmissionsContent
@@ -12,10 +13,14 @@ export default () => {
     (state) => state.addToLeftTabs,
   );
 
-  const { data: submissions } = useSuspenseQuery<Submission[]>({
+  const { data: submissions, isPending } = useQuery<Submission[]>({
     queryKey: ["problem", problemSlug, "submissions"],
-    queryFn: async () => [],
+    queryFn: () => getSubmissionsForProblem(problemSlug),
   });
+
+  if (isPending) {
+    return <>Loading Submissions.....</>;
+  }
 
   if (submissions.length == 0) {
     return (

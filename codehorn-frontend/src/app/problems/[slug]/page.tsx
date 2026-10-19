@@ -10,6 +10,7 @@ import DescriptionContent from "./components/DescriptionContent";
 import AppLayout from "@/src/components/AppLayout";
 import PlaygroundContent from "./components/PlaygroundContent";
 import ResizablePanel from "../../components/ResizablePanel";
+import { Suspense } from "react";
 
 type ProblemPlaygroundPageProps = {
   params: Promise<{ slug: string }>;
