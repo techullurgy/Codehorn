@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "../index.css";
+import QueryClientProvider from "../components/QueryClientProvider";
 
 export const metadata: Metadata = {
   title: "CodeHorn - Sandbox & Coding Platform",
@@ -15,7 +16,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className="antialiased" suppressHydrationWarning>
-        {children}
+        <QueryClientProvider>{children}</QueryClientProvider>
       </body>
     </html>
   );

@@ -11,7 +11,7 @@ type SubmissionDetailsProps = {
   submissionId: string;
 };
 
-// SubmissionDetails2
+// SubmissionDetails
 export default ({ submissionId }: SubmissionDetailsProps) => {
   const slug = useProblemPlaygroundStore((state) => state.slug);
 
